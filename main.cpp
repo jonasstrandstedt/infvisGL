@@ -10,6 +10,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "Engine.h"
 #include "Sphere.h"
 
+#include "infvis/DataCube.h"
+
 gl4::VBO *obj;
 gl4::Sphere *sphere;
 gl4::Engine *engine;
@@ -96,6 +98,23 @@ void myInitFunc(void)
 	gl4::Shader *s2 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_color.glsl");
 	gl4::ShaderManager::getInstance()->addShaderProgram("color", s2);
 
+	DataCube dc(2,4,6);
+
+	dc.SetItem(0, 1, 4, 32.0f);
+
+	for(int x = 0; x < 2; ++x)
+	{
+		for(int y = 0; y < 4; ++y)
+		{
+			for(int z = 0; z < 6; ++z)
+			{
+				printf(" %f ",dc.GetItem(x, y, z));
+			}
+			printf("\n");
+		}
+
+		printf("\n ---------- \n\n");
+	}
 }
 
 void myRenderFunc(void) 
