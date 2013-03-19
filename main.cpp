@@ -28,6 +28,8 @@ void myRenderFunc(void);
 void myInitFunc(void);
 void myUpdateFunc(float dt);
 
+void scatterPlot(void);
+
 int main(int argc, char **argv) {
 
 	// create engine object
@@ -36,7 +38,7 @@ int main(int argc, char **argv) {
 	// set callbacks
 	engine->setKeyBoardCallbackfunc(keyboardCallback);
 	engine->setUpdateFunc(myUpdateFunc);
-	engine->setRenderFunc(myRenderFunc);
+	engine->setRenderFunc(scatterPlot);
 	//engine->setDeferredRenderFunc(myDeferredRenderFunc);
 	engine->setInitFunc(myInitFunc);
 	
@@ -98,14 +100,29 @@ void myInitFunc(void)
 
 	gl4::Shader *s1 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_textur.glsl");
 	gl4::ShaderManager::getInstance()->addShaderProgram("textur", s1);
+
 	gl4::Shader *s2 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_color.glsl");
 	gl4::ShaderManager::getInstance()->addShaderProgram("color", s2);
 
-	const int size[3] = {4,4,4};
+	gl4::Shader *s3 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_uniform_color.glsl");
+	gl4::ShaderManager::getInstance()->addShaderProgram("uniform_color", s3);
+
+	const int size[3] = {2,4,4};
 
 	dc = new DataCube(size[0], size[1], size[2]);
 
 	dc->SetItem(0, 1, 3, 32.0f);
+	dc->SetItem(1, 2, 3, -10.0f);
+
+	dc->CalculateAttribRanges();
+
+	printf("(Min/Max): \n");
+	for(int z=0; z < size[2]; ++z)
+	{
+		printf("(%f,%f) ", dc->GetAttribRange(z).x, dc->GetAttribRange(z).y);
+	}
+
+	printf("\n\n");
 
 	for(int x = 0; x < size[0]; ++x)
 	{
@@ -127,11 +144,19 @@ void myRenderFunc(void)
 
 	gl4::ShaderManager::getInstance()->bindShader("color");
 
-	glm::mat4 plane_transform = glm::scale(glm::mat4(1.0), glm::vec3(5));
-	plane_transform = glm::translate(plane_transform,glm::vec3(-0.5,-0.3, 0.0));
-	plane_transform = glm::rotate(plane_transform,-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	float size = 100.0;
+	glm::vec3 position = glm::vec3(100,100,0);
 
-	engine->usePerspectiveProjection(plane_transform);
+	glm::mat4 transform = glm::translate(glm::mat4(), position);
+	transform = glm::scale(transform, glm::vec3(size));
+	transform = glm::translate(transform, glm::vec3(-0.5, -0.5, 0.0));
+	
+	//plane_transform = glm::translate(plane_transform,glm::vec3(-0.5,-0.3, 0.0));
+	//plane_transform = glm::rotate(plane_transform,-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+
+	//engine->usePerspectiveProjection(plane_transform);
+	engine->useOrthogonalProjection(transform);
+
 	obj->render();
 
 	
@@ -142,6 +167,27 @@ void myRenderFunc(void)
 	// engine->usePerspectiveProjection(transform);
 	// sphere->render();
 
+}
+
+void scatterPlot(void)
+{
+	gl4::ShaderManager::getInstance()->bindShader("uniform_color");
+	GLuint program = gl4::ShaderManager::getInstance()->getShaderProgram("uniform_color");
+	int colorLoc = glGetUniformLocation(program, "uniform_color");
+
+	float size = 100.0;
+	glm::vec3 position = glm::vec3(100,100,0);
+	glm::vec3 color = glm::vec3(1.0,0.0,0.0);
+
+	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+
+	glm::mat4 transform = glm::translate(glm::mat4(), position);
+	transform = glm::scale(transform, glm::vec3(size));
+	transform = glm::translate(transform, glm::vec3(-0.5, -0.5, 0.0));
+
+	engine->useOrthogonalProjection(transform);
+
+	obj->render();
 }
 
 
