@@ -12,6 +12,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 #include "infvis/DataCube.h"
 
+DataCube * dc;
+
 gl4::VBO *obj;
 gl4::Sphere *sphere;
 gl4::Engine *engine;
@@ -50,6 +52,7 @@ int main(int argc, char **argv) {
 	delete sphere;
 	delete obj;
 	delete engine;
+	delete dc;
 
 	// return success
 	return 0;
@@ -98,17 +101,19 @@ void myInitFunc(void)
 	gl4::Shader *s2 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_color.glsl");
 	gl4::ShaderManager::getInstance()->addShaderProgram("color", s2);
 
-	DataCube dc(2,4,6);
+	const int size[3] = {4,4,4};
 
-	dc.SetItem(0, 1, 4, 32.0f);
+	dc = new DataCube(size[0], size[1], size[2]);
 
-	for(int x = 0; x < 2; ++x)
+	dc->SetItem(0, 1, 3, 32.0f);
+
+	for(int x = 0; x < size[0]; ++x)
 	{
-		for(int y = 0; y < 4; ++y)
+		for(int y = 0; y < size[1]; ++y)
 		{
-			for(int z = 0; z < 6; ++z)
+			for(int z = 0; z < size[2]; ++z)
 			{
-				printf(" %f ",dc.GetItem(x, y, z));
+				printf(" %f ",dc->GetItem(x, y, z));
 			}
 			printf("\n");
 		}
@@ -130,12 +135,12 @@ void myRenderFunc(void)
 	obj->render();
 
 	
-	gl4::ShaderManager::getInstance()->bindShader("textur");
-	gl4::TextureManager::getInstance()->bindTexture("earth_diffuse");
-	glm::mat4 transform = glm::rotate(glm::mat4(1.0f),angle[1], glm::vec3(0.0f, 1.0f, 0.0f));
-	transform = glm::rotate(transform,angle[0], glm::vec3(1.0f, 0.0f, 0.0f));
-	engine->usePerspectiveProjection(transform);
-	sphere->render();
+	// gl4::ShaderManager::getInstance()->bindShader("textur");
+	// gl4::TextureManager::getInstance()->bindTexture("earth_diffuse");
+	// glm::mat4 transform = glm::rotate(glm::mat4(1.0f),angle[1], glm::vec3(0.0f, 1.0f, 0.0f));
+	// transform = glm::rotate(transform,angle[0], glm::vec3(1.0f, 0.0f, 0.0f));
+	// engine->usePerspectiveProjection(transform);
+	// sphere->render();
 
 }
 
