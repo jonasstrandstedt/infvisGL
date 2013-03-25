@@ -21,6 +21,12 @@ DataCube::~DataCube()
 	if(data)
 		delete[] data;
 }
+
+const int * DataCube::GetDataCount()
+{
+	return dataCount;
+}
+
 float DataCube::GetItem(int index, int time, int attrib)
 {
 	// Assert bounds

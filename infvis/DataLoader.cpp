@@ -77,11 +77,17 @@ DataCube * DataLoader::getDataCube()
 						int column = 0;
 						while(startpos != std::string::npos) {
 							std::string val = line.substr(startpos+1, stoppos-startpos-1);
-	 										//std::cout << "val = " << val << std::endl;
 
 							if (column > 1)
 							{
+								
+	 							//std::cout << "val (string) = " << val << std::endl;
+	 							for (int i = 0; i < val.length(); ++i) {
+	 							    if (val[i] == ',')
+	 							      val[i] = '.';
+	 							  }
 								float fval = std::atof(val.c_str());
+	 							//std::cout << "val (float)  = " << fval << std::endl;
 								d->SetItem(item-1, column -2, i, fval);
 							}
 

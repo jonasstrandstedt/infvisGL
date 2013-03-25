@@ -65,17 +65,19 @@ int main(int argc, char **argv) {
 
 void keyboardCallback(int key, int state) 
 {
+
+	const int * datacount = dc->GetDataCount();
 	// increase and decrease tessellation levels
 	if(key == GLFW_KEY_RIGHT && state == GLFW_PRESS) {
-		if(year < 50)
+		if(year < datacount[1])
 			year++;
 	}
 	if(key == GLFW_KEY_LEFT && state == GLFW_PRESS) {
-		if(year > 1)
+		if(year > 0)
 			year--;
 	}
 
-	std::cout << "Rendering year " << year << std::endl;
+	std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 }
 
 
@@ -148,6 +150,14 @@ void myInitFunc(void)
 	dc = dl->getDataCube();
 	dc->CalculateAttribRanges();
 	
+	glm::vec2 rangex = dc->GetAttribRange(0);
+	glm::vec2 rangey = dc->GetAttribRange(1);
+	glm::vec2 rangez = dc->GetAttribRange(2);
+
+	std::cout << "dc->GetAttribRange(0) = " << rangex[0] << " -> " << rangex[1] << std::endl;
+	std::cout << "dc->GetAttribRange(1) = " << rangey[0] << " -> " << rangey[1] << std::endl;
+	std::cout << "dc->GetAttribRange(2) = " << rangez[0] << " -> " << rangez[1] << std::endl;
+
 }
 
 void myRenderFunc(void) 
@@ -186,14 +196,15 @@ void scatterPlot(void)
 	GLuint program = gl4::ShaderManager::getInstance()->getShaderProgram("uniform_color");
 	int colorLoc = glGetUniformLocation(program, "uniform_color");
 
-	float size = 10.0;
+	float size = 2.0;
 	glm::vec3 color = glm::vec3(1.0,0.0,0.0);
 
 	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 	glm::vec2 rangex = dc->GetAttribRange(0);
 	glm::vec2 rangey = dc->GetAttribRange(1);
 
-	for (int i = 0; i < 100; ++i)
+	const int * datacount = dc->GetDataCount();
+	for (int i = 0; i < datacount[0]; ++i)
 	{
 		float x = dc->GetItem(i, year, 0);
 		float y = dc->GetItem(i, year, 1);
