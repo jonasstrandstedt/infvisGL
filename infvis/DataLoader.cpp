@@ -82,9 +82,9 @@ DataCube * DataLoader::getDataCube()
 							{
 								
 	 							//std::cout << "val (string) = " << val << std::endl;
-	 							for (int i = 0; i < val.length(); ++i) {
-	 							    if (val[i] == ',')
-	 							      val[i] = '.';
+	 							for (int n = 0; n < val.length(); ++n) {
+	 							    if (val[n] == ',')
+	 							      val[n] = '.';
 	 							  }
 								float fval = std::atof(val.c_str());
 	 							//std::cout << "val (float)  = " << fval << std::endl;

@@ -8,7 +8,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include "Engine.h"
-#include "Sphere.h"
+#include "Circle.h"
 
 #include "infvis/DataCube.h"
 #include "infvis/DataLoader.h"
@@ -16,8 +16,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 DataCube * dc;
 DataLoader * dl;
 
-gl4::VBO *obj;
-gl4::Sphere *sphere;
+gl4::Circle *obj;
 gl4::Engine *engine;
 glm::vec2 angle;
 bool wireframe = false;
@@ -54,7 +53,6 @@ int main(int argc, char **argv) {
 	engine->render();
 
 	// cleanup
-	delete sphere;
 	delete obj;
 	delete engine;
 	delete dc;
@@ -89,11 +87,8 @@ void myInitFunc(void)
 
 	angle[0] = 0.0f;
 	angle[1] = 0.0f;
-	obj = new gl4::VBO();
+	obj = new gl4::Circle(1.0,100);
 	obj->init();
-
-	sphere = new gl4::Sphere(1.0, 30);
-	sphere->init();
 
 	tess = 1;
 
@@ -109,6 +104,7 @@ void myInitFunc(void)
 	gl4::Shader *s3 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_uniform_color.glsl");
 	gl4::ShaderManager::getInstance()->addShaderProgram("uniform_color", s3);
 
+/*
 	const int size[3] = {2,4,4};
 
 	dc = new DataCube(size[0], size[1], size[2]);
@@ -142,7 +138,7 @@ void myInitFunc(void)
 	dc->CalculateAttribRanges();
 	
 	delete dc;
-
+*/
 	dl = new DataLoader();
 	dl->addAttribFromFile("fertility", "data/fertility_rate.csv");
 	dl->addAttribFromFile("population", "data/total_population.csv");
@@ -196,10 +192,27 @@ void scatterPlot(void)
 	GLuint program = gl4::ShaderManager::getInstance()->getShaderProgram("uniform_color");
 	int colorLoc = glGetUniformLocation(program, "uniform_color");
 
-	float size = 2.0;
+	float size = 200.0;
 	glm::vec3 color = glm::vec3(1.0,0.0,0.0);
+	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+	/*
+	glm::vec3 p = glm::vec3(200,200,0);
+
+
+	glm::mat4 t = glm::translate(glm::mat4(), p);
+	t = glm::scale(t, glm::vec3(size));
+
+	engine->useOrthogonalProjection(t);
+
 
 	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+
+	obj->render();
+	*/
+
+	size = 1.0;
+
+
 	glm::vec2 rangex = dc->GetAttribRange(0);
 	glm::vec2 rangey = dc->GetAttribRange(1);
 
@@ -211,6 +224,7 @@ void scatterPlot(void)
 
 		float posx = (x - rangex[0]) / (rangex[1] - rangex[0]) * WINDOW_WIDTH;
 		float posy = (y - rangey[0]) / (rangey[1] - rangey[0]) * WINDOW_HEIGHT;
+		size = (y - rangey[0]) / (rangey[1] - rangey[0]) * 50.0;
 		//std::cout << "xy = (" << x << ", " << y << ")" << std::endl;
 		//std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
 

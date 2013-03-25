@@ -28,6 +28,7 @@ OBJECTS += GL4-engine/src/Shader.o
 #OBJECTS += GL4-engine/src/DeferredShader.o
 OBJECTS += GL4-engine/src/TextureManager.o
 OBJECTS += GL4-engine/src/Sphere.o
+OBJECTS += GL4-engine/src/Circle.o
 OBJECTS += GL4-engine/src/Geometry.o
 OBJECTS += infvis/DataLoader.o
 OBJECTS += infvis/DataCube.o
