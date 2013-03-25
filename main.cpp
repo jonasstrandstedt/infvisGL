@@ -21,6 +21,7 @@ gl4::Sphere *sphere;
 gl4::Engine *engine;
 glm::vec2 angle;
 bool wireframe = false;
+int year = 40;
 
 int tess;
 
@@ -65,19 +66,16 @@ int main(int argc, char **argv) {
 void keyboardCallback(int key, int state) 
 {
 	// increase and decrease tessellation levels
-	if(key == 'I' && state == GLFW_PRESS) {
-		if(tess < 64)
-			tess++;
+	if(key == GLFW_KEY_RIGHT && state == GLFW_PRESS) {
+		if(year < 50)
+			year++;
 	}
-	if(key == 'O' && state == GLFW_PRESS) {
-		if(tess > 1)
-			tess--;
+	if(key == GLFW_KEY_LEFT && state == GLFW_PRESS) {
+		if(year > 1)
+			year--;
 	}
 
-	// toggle wireframe
-	if(key == 'W' && state == GLFW_PRESS) {
-		wireframe = ! wireframe;
-	}
+	std::cout << "Rendering year " << year << std::endl;
 }
 
 
@@ -139,12 +137,17 @@ void myInitFunc(void)
 
 		printf("\n ---------- \n\n");
 	}
+	dc->CalculateAttribRanges();
+	
+	delete dc;
 
 	dl = new DataLoader();
 	dl->addAttribFromFile("fertility", "data/fertility_rate.csv");
 	dl->addAttribFromFile("population", "data/total_population.csv");
 	dl->addAttribFromFile("broadband", "data/fixed_broadband_connections.csv");
-	dl->getDataCube();
+	dc = dl->getDataCube();
+	dc->CalculateAttribRanges();
+	
 }
 
 void myRenderFunc(void) 
@@ -183,19 +186,36 @@ void scatterPlot(void)
 	GLuint program = gl4::ShaderManager::getInstance()->getShaderProgram("uniform_color");
 	int colorLoc = glGetUniformLocation(program, "uniform_color");
 
-	float size = 100.0;
-	glm::vec3 position = glm::vec3(100,100,0);
+	float size = 10.0;
 	glm::vec3 color = glm::vec3(1.0,0.0,0.0);
 
 	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+	glm::vec2 rangex = dc->GetAttribRange(0);
+	glm::vec2 rangey = dc->GetAttribRange(1);
 
-	glm::mat4 transform = glm::translate(glm::mat4(), position);
-	transform = glm::scale(transform, glm::vec3(size));
-	transform = glm::translate(transform, glm::vec3(-0.5, -0.5, 0.0));
+	for (int i = 0; i < 100; ++i)
+	{
+		float x = dc->GetItem(i, year, 0);
+		float y = dc->GetItem(i, year, 1);
 
-	engine->useOrthogonalProjection(transform);
+		float posx = (x - rangex[0]) / (rangex[1] - rangex[0]) * WINDOW_WIDTH;
+		float posy = (y - rangey[0]) / (rangey[1] - rangey[0]) * WINDOW_HEIGHT;
+		//std::cout << "xy = (" << x << ", " << y << ")" << std::endl;
+		//std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
 
-	obj->render();
+		glm::vec3 position = glm::vec3(posx,posy,0);
+
+		glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+
+		glm::mat4 transform = glm::translate(glm::mat4(), position);
+		transform = glm::scale(transform, glm::vec3(size));
+		transform = glm::translate(transform, glm::vec3(-0.5, -0.5, 0.0));
+
+		engine->useOrthogonalProjection(transform);
+
+		obj->render();
+	}
+
 }
 
 

@@ -18,8 +18,8 @@ gl4::Engine::Engine(int argc, char **argv) {
 	_renderFunc = 0;
 	_initFunc = 0;
 
-	_windowWidth = 800;
-	_windowHeight = 600;
+	_windowWidth = WINDOW_WIDTH;
+	_windowHeight = WINDOW_HEIGHT;
 
 	glm::mat4 Perspective = glm::perspective(45.0f, static_cast<float>(_windowWidth) / static_cast<float>(_windowHeight), 0.1f, 100.0f);
 	glm::mat4 Orthogonal = glm::ortho(0.0f,static_cast<float>(_windowWidth), 0.0f,static_cast<float>(_windowHeight), 0.1f, 100.0f);
