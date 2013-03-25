@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <ifstream>
+#include <algorithm>
 
 DataLoader::DataLoader()
 {
@@ -30,34 +30,80 @@ DataCube * DataLoader::getDataCube()
 	{
 
 		int cols = 0;
-		std::ifstream *file = new std::ifstream(attribNames.at(0).c_str(), ios_base::in);
+		std::ifstream *file = new std::ifstream(filenames.at(0).c_str());
+		if (file->is_open())
+		{
+			std::cout << "File opened" << std::endl;
 
-		std::string line;
-		getline(file,line);
-		size_t startpos = 0;
-		size_t stoppos =line.find_first_of(";\n");
-		++cols;
-		while(startpos != std::string::npos) {
-			startpos = line.find_first_of(";\n");
-			stoppos = line.find_first_of(";\n", startpos);
+			items = std::count(std::istreambuf_iterator<char>(*file), std::istreambuf_iterator<char>(), '\n') ;
+
+			std::string line;
+			file->seekg (0, file->beg);
+			getline(*file,line);
+			//std::cout << "line = " << line << std::endl;
+			
+			size_t startpos = 0;
+			size_t stoppos = line.find_first_of(";");
 			++cols;
+			while(startpos != std::string::npos && cols != 100) {
+				startpos = line.find_first_of(";", stoppos+1);
+				stoppos = line.find_first_of(";", startpos+1);
+				++cols;
+			}
+			t = cols - 2;
+    		file->close();
+    		delete file;
+
+			std::cout << "Creating DataCube("<< items << "," << t << "," << attribs << ")" << std::endl;
+			DataCube * d = new DataCube(items,t,attribs);
+
+			for (int i = 0; i < attribs; ++i)
+			{
+				file = new std::ifstream(filenames.at(i).c_str());
+				if (!file->is_open())
+				{
+					std::cerr << "ERROR: Could not open file: " << filenames.at(i) << std::endl;
+					exit(0);
+				}
+				//std::getline(*file, line);
+				int item = 0;
+				while(std::getline(*file, line)) {
+
+					if (item > 0)
+					{
+	 									//std::cout << "==================="<< std::endl;
+						startpos = 0;
+						stoppos = line.find_first_of(";");
+						int column = 0;
+						while(startpos != std::string::npos) {
+							std::string val = line.substr(startpos+1, stoppos-startpos-1);
+	 										//std::cout << "val = " << val << std::endl;
+
+							if (column > 1)
+							{
+								float fval = std::atof(val.c_str());
+								d->SetItem(item-1, column -2, i, fval);
+							}
+
+
+							startpos = line.find_first_of(";", stoppos);
+							stoppos = line.find_first_of(";", startpos+1);
+							++column;
+						}
+					}
+					
+					++item;
+
+				}
+				file->close();
+ 		   		delete file;
+			}
+			
+			
+			return d;
 		}
-		items = cols;
-
-    	file->seekg (0, is.beg);
-	 	items = std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n');
 
 
-
-    	file->seekg (0, is.beg);
-    	/*
-		while(getline(file,line)) {
-
-		}
-*/
-		DataCube * d = new DataCube(items,t,attribs);
-
-		return d;
 	}
 	return 0;
 }

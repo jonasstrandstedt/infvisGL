@@ -11,8 +11,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "Sphere.h"
 
 #include "infvis/DataCube.h"
+#include "infvis/DataLoader.h"
 
 DataCube * dc;
+DataLoader * dl;
 
 gl4::VBO *obj;
 gl4::Sphere *sphere;
@@ -46,7 +48,7 @@ int main(int argc, char **argv) {
 	}
 
 	// do render
-	engine->render();
+	//engine->render();
 
 	// cleanup
 	delete sphere;
@@ -120,6 +122,12 @@ void myInitFunc(void)
 
 		printf("\n ---------- \n\n");
 	}
+
+	dl = new DataLoader();
+	dl->addAttribFromFile("fertility", "data/fertility_rate.csv");
+	dl->addAttribFromFile("population", "data/total_population.csv");
+	dl->addAttribFromFile("broadband", "data/fixed_broadband_connections.csv");
+	dl->getDataCube();
 }
 
 void myRenderFunc(void) 

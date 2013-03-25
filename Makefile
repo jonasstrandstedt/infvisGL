@@ -76,6 +76,7 @@ clean:
 	-@echo "Cleaning"
 	-$(RM) *.o
 	-$(RM) GL4-engine/src/*.o
+	-$(RM) infvis/*.o
 #-$(RM) GL4-engine/src/*.d
 
 
