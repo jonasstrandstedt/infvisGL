@@ -88,7 +88,7 @@ DataCube * DataLoader::getDataCube()
 	 							  }
 								float fval = std::atof(val.c_str());
 	 							//std::cout << "val (float)  = " << fval << std::endl;
-								d->SetItem(item-1, column -2, i, fval);
+								d->setItem(item-1, column -2, i, fval);
 							}
 
 

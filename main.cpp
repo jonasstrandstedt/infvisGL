@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 void keyboardCallback(int key, int state) 
 {
 
-	const int * datacount = dc->GetDataCount();
+	const int * datacount = dc->getDataCount();
 	// increase and decrease tessellation levels
 	if(key == GLFW_KEY_RIGHT && state == GLFW_PRESS) {
 		if(year < datacount[1])
@@ -144,11 +144,11 @@ void myInitFunc(void)
 	dl->addAttribFromFile("population", "data/total_population.csv");
 	dl->addAttribFromFile("broadband", "data/fixed_broadband_connections.csv");
 	dc = dl->getDataCube();
-	dc->CalculateAttribRanges();
+	dc->calculateAttribRanges();
 	
-	glm::vec2 rangex = dc->GetAttribRange(0);
-	glm::vec2 rangey = dc->GetAttribRange(1);
-	glm::vec2 rangez = dc->GetAttribRange(2);
+	glm::vec2 rangex = dc->getAttribRange(0);
+	glm::vec2 rangey = dc->getAttribRange(1);
+	glm::vec2 rangez = dc->getAttribRange(2);
 
 	std::cout << "dc->GetAttribRange(0) = " << rangex[0] << " -> " << rangex[1] << std::endl;
 	std::cout << "dc->GetAttribRange(1) = " << rangey[0] << " -> " << rangey[1] << std::endl;
@@ -158,7 +158,6 @@ void myInitFunc(void)
 
 void myRenderFunc(void) 
 {
-
 	gl4::ShaderManager::getInstance()->bindShader("color");
 
 	float size = 100.0;
@@ -175,7 +174,6 @@ void myRenderFunc(void)
 	engine->useOrthogonalProjection(transform);
 
 	obj->render();
-
 	
 	// gl4::ShaderManager::getInstance()->bindShader("textur");
 	// gl4::TextureManager::getInstance()->bindTexture("earth_diffuse");
@@ -213,14 +211,14 @@ void scatterPlot(void)
 	size = 1.0;
 
 
-	glm::vec2 rangex = dc->GetAttribRange(0);
-	glm::vec2 rangey = dc->GetAttribRange(1);
+	glm::vec2 rangex = dc->getAttribRange(0);
+	glm::vec2 rangey = dc->getAttribRange(1);
 
-	const int * datacount = dc->GetDataCount();
+	const int * datacount = dc->getDataCount();
 	for (int i = 0; i < datacount[0]; ++i)
 	{
-		float x = dc->GetItem(i, year, 0);
-		float y = dc->GetItem(i, year, 1);
+		float x = dc->getItem(i, year, 0);
+		float y = dc->getItem(i, year, 1);
 
 		float posx = (x - rangex[0]) / (rangex[1] - rangex[0]) * WINDOW_WIDTH;
 		float posy = (y - rangey[0]) / (rangey[1] - rangey[0]) * WINDOW_HEIGHT;
@@ -229,6 +227,10 @@ void scatterPlot(void)
 		//std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
 
 		glm::vec3 position = glm::vec3(posx,posy,0);
+
+		float val = (x - rangex[0]) / (rangex[1] - rangex[0]);
+
+		color = glm::vec3(1.0,0.0,0.0)*(1.0f - val) + glm::vec3(0.0,0.0,1.0)*val;
 
 		glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
@@ -240,7 +242,6 @@ void scatterPlot(void)
 
 		obj->render();
 	}
-
 }
 
 
