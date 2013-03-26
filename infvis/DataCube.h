@@ -16,6 +16,7 @@ public:
 	const std::string & getAttribName(int attrib);
 	const std::string & getEntryName(int index);
 	const glm::vec2 & getAttribRange(int attribute);
+	
 
 	void setItem(int index, int time, int attrib, float value);
 	void setAtrribName(int attrib, const std::string &name);

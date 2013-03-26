@@ -32,6 +32,7 @@ OBJECTS += GL4-engine/src/Circle.o
 OBJECTS += GL4-engine/src/Geometry.o
 OBJECTS += infvis/DataLoader.o
 OBJECTS += infvis/DataCube.o
+OBJECTS += infvis/ColorMap.o
 
 # Name the output file, if changed then the sgct_sim.sh script needs to be edited as well
 OUTPUT ?= Program

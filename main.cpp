@@ -12,9 +12,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 #include "infvis/DataCube.h"
 #include "infvis/DataLoader.h"
+#include "infvis/ColorMap.h"
 
 DataCube * dc;
 DataLoader * dl;
+ColorMap * cm;
+ColorMap::LinearPart * cmp1;
+ColorMap::LinearPart * cmp2;
+ColorMap::LinearPart * cmp3;
 
 gl4::Circle *obj;
 gl4::Engine *engine;
@@ -56,6 +61,10 @@ int main(int argc, char **argv) {
 	delete obj;
 	delete engine;
 	delete dc;
+	delete cm;
+	delete cmp1;
+	delete cmp2;
+	delete cmp3;
 
 	// return success
 	return 0;
@@ -145,6 +154,18 @@ void myInitFunc(void)
 	dl->addAttribFromFile("broadband", "data/fixed_broadband_connections.csv");
 	dc = dl->getDataCube();
 	dc->calculateAttribRanges();
+
+	cm = new ColorMap();
+
+	cmp1 = new ColorMap::LinearPart(glm::vec3(1.0,0.0,0.0), glm::vec3(0.0,1.0,0.0));
+	cmp2 = new ColorMap::LinearPart(glm::vec3(0.0,1.0,0.0), glm::vec3(0.0,0.0,1.0));
+	cmp3 = new ColorMap::LinearPart(glm::vec3(0.0,0.0,1.0), glm::vec3(1.0,0.0,0.0));
+
+	cm->addPart(cmp1);
+	cm->addPart(cmp2);
+	cm->addPart(cmp3);
+	cm->setDataCube(dc);
+	cm->setAxis(0);
 	
 	glm::vec2 rangex = dc->getAttribRange(0);
 	glm::vec2 rangey = dc->getAttribRange(1);
@@ -230,7 +251,8 @@ void scatterPlot(void)
 
 		float val = (x - rangex[0]) / (rangex[1] - rangex[0]);
 
-		color = glm::vec3(1.0,0.0,0.0)*(1.0f - val) + glm::vec3(0.0,0.0,1.0)*val;
+		//color = glm::vec3(1.0,0.0,0.0)*(1.0f - val) + glm::vec3(0.0,0.0,1.0)*val;
+		color = cm->map(x);
 
 		glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
