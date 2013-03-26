@@ -90,7 +90,7 @@ void ScatterPlot::render()
 
 		if (colormap != 0)
 		{
-			float colorval = dc->getItem(i, year, colormap->getAxis());
+			float colorval = dc->getItem(i, year, colormap->getIndex());
 			color = colormap->map(colorval);
 		}
 		//std::cout << "xy = (" << x << ", " << y << ")" << std::endl;

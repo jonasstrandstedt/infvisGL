@@ -18,7 +18,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 DataCube * dc;
 DataLoader * dl;
 ColorMap * cm;
-ColorMap::LinearPart * cmp1;
+ColorMap::HSVPart * cmp1;
 ColorMap::LinearPart * cmp2;
 ColorMap::LinearPart * cmp3;
 
@@ -28,13 +28,11 @@ int year = 40;
 SplitContainer *sc;
 ScatterPlot *sp;
 
-
 void keyboardCallback(int key, int state);
 void myRenderFunc(void);
 //void myDeferredRenderFunc(void);
 void myInitFunc(void);
 void myUpdateFunc(float dt);
-
 
 int main(int argc, char **argv) {
 
@@ -120,15 +118,15 @@ void myInitFunc(void)
 
 	cm = new ColorMap();
 
-	cmp1 = new ColorMap::LinearPart(glm::vec3(1.0,0.0,0.0), glm::vec3(0.0,1.0,0.0));
+	cmp1 = new ColorMap::HSVPart(glm::vec3(0.0,0.5,0.5), glm::vec3(360.0,0.5,0.5));
 	cmp2 = new ColorMap::LinearPart(glm::vec3(0.0,1.0,0.0), glm::vec3(0.0,0.0,1.0));
 	cmp3 = new ColorMap::LinearPart(glm::vec3(0.0,0.0,1.0), glm::vec3(1.0,0.0,0.0));
 
 	cm->addPart(cmp1);
-	cm->addPart(cmp2);
-	cm->addPart(cmp3);
+	//cm->addPart(cmp2);
+	//cm->addPart(cmp3);
 	cm->setDataCube(dc);
-	cm->setAxis(2);
+	cm->setIndex(2);
 	
 	glm::vec2 rangex = dc->getAttribRange(0);
 	glm::vec2 rangey = dc->getAttribRange(1);
@@ -157,7 +155,6 @@ void myInitFunc(void)
 void myRenderFunc(void) 
 {
 	sc->render();
-
 }
 
 void myUpdateFunc(float dt)
