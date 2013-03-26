@@ -5,7 +5,7 @@
 ColorMap::ColorMap() :
 	dc(NULL),
 	range(0.0,1.0),
-	axis(0)
+	index(0)
 {
 
 }
@@ -35,11 +35,11 @@ void ColorMap::setDataCube(DataCube * _cube)
 	}
 }
 
-void ColorMap::setAxis(int _axis)
+void ColorMap::setIndex(int _index)
 {
-	if(axis >= 0)
+	if(_index >= 0)
 	{
-		axis = _axis;
+		index = _index;
 		updateRange();
 	}
 }
@@ -51,12 +51,13 @@ glm::vec3 ColorMap::map(float _value)
 		// Remap value to [0-1]
 		_value = (_value - range[0]) / (range[1] - range[0]);
 
-		int index = (int)( _value * 0.99 * (float)(parts.size()) );
+		int index = (int)( _value * 0.99999 * (float)(parts.size()) );
 
 		float min = (float)index / (float)(parts.size());
 		float max = (float)(index+1) / (float)(parts.size());
 		_value = (_value - min) / (max - min);
 
+		index = glm::clamp(index, 0, (int)parts.size()-1);
 		return parts[index]->map(_value);
 	}
 	return glm::vec3(1.0);
@@ -68,8 +69,8 @@ void ColorMap::updateRange()
 	{
 		const int * dataCount = dc->getDataCount();
 
-		if(axis < dataCount[3])
-			range = dc->getAttribRange(axis);
+		if(index < dataCount[3])
+			range = dc->getAttribRange(index);
 	}
 }
 

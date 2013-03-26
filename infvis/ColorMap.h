@@ -19,7 +19,7 @@ public:
 	void clearParts();
 
 	void setDataCube(DataCube * _cube);
-	void setAxis(int _axis);
+	void setIndex(int _index);
 
 	glm::vec3 map(float _value);
 private:
@@ -29,7 +29,7 @@ private:
 
 	DataCube * dc;
 	glm::vec2 range;
-	int axis;
+	int index;
 };
 
 class ColorMap::Part

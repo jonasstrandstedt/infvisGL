@@ -123,8 +123,8 @@ void myInitFunc(void)
 	cm->addPart(cmp1);
 	//cm->addPart(cmp2);
 	//cm->addPart(cmp3);
-	cm->setDataCube(dc);
-	cm->setAxis(0);
+	//cm->setDataCube(dc);
+	cm->setIndex(0);
 	
 	glm::vec2 rangex = dc->getAttribRange(0);
 	glm::vec2 rangey = dc->getAttribRange(1);
