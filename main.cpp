@@ -28,13 +28,11 @@ int year = 40;
 SplitContainer *sc;
 ScatterPlot *sp;
 
-
 void keyboardCallback(int key, int state);
 void myRenderFunc(void);
 //void myDeferredRenderFunc(void);
 void myInitFunc(void);
 void myUpdateFunc(float dt);
-
 
 int main(int argc, char **argv) {
 
@@ -125,7 +123,7 @@ void myInitFunc(void)
 	cm->addPart(cmp1);
 	//cm->addPart(cmp2);
 	//cm->addPart(cmp3);
-	//cm->setDataCube(dc);
+	cm->setDataCube(dc);
 	cm->setAxis(0);
 	
 	glm::vec2 rangex = dc->getAttribRange(0);
