@@ -22,48 +22,48 @@ DataCube::~DataCube()
 		delete[] data;
 }
 
-const int * DataCube::GetDataCount()
+const int * DataCube::getDataCount()
 {
 	return dataCount;
 }
 
-float DataCube::GetItem(int index, int time, int attrib)
+float DataCube::getItem(int index, int time, int attrib)
 {
 	// Assert bounds
 	return data[index * (dataCount[1]*dataCount[2]) + time * dataCount[2] + attrib];
 }
 
-const std::string & DataCube::GetAttribName(int attrib)
+const std::string & DataCube::getAttribName(int attrib)
 {
 	return attribName[attrib];
 }
 
-const std::string & DataCube::GetEntryName(int index)
+const std::string & DataCube::getEntryName(int index)
 {
 	return entryName[index];
 }
 
-const glm::vec2 & DataCube::GetAttribRange(int attrib)
+const glm::vec2 & DataCube::getAttribRange(int attrib)
 {
 	return attribRange[attrib];
 }
 
-void DataCube::SetItem(int index, int time, int attrib, float value)
+void DataCube::setItem(int index, int time, int attrib, float value)
 {
 	data[index * (dataCount[1]*dataCount[2]) + time * dataCount[2] + attrib] = value;
 }
 
-void DataCube::SetAtrribName(int attrib, const std::string &name)
+void DataCube::setAtrribName(int attrib, const std::string &name)
 {
 	attribName[attrib] = name;
 }
 
-void DataCube::SetEntryName(int index, const std::string &name)
+void DataCube::setEntryName(int index, const std::string &name)
 {
 	entryName[index] = name;
 }
 
-void DataCube::CalculateAttribRanges()
+void DataCube::calculateAttribRanges()
 {
 	for(int z=0; z<dataCount[2]; ++z)
 	{
@@ -76,8 +76,8 @@ void DataCube::CalculateAttribRanges()
 		{
 			for(int z=0; z<dataCount[2]; ++z)
 			{
-				attribRange[z][0] = glm::min(GetItem(x, y, z), attribRange[z][0]);
-				attribRange[z][1] = glm::max(GetItem(x, y, z), attribRange[z][1]);
+				attribRange[z][0] = glm::min(getItem(x, y, z), attribRange[z][0]);
+				attribRange[z][1] = glm::max(getItem(x, y, z), attribRange[z][1]);
 			}
 		}
 	}

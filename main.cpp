@@ -13,9 +13,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 #include "infvis/DataCube.h"
 #include "infvis/DataLoader.h"
+#include "infvis/ColorMap.h"
 
 DataCube * dc;
 DataLoader * dl;
+ColorMap * cm;
+ColorMap::LinearPart * cmp1;
+ColorMap::LinearPart * cmp2;
+ColorMap::LinearPart * cmp3;
 
 gl4::Engine *engine;
 glm::vec2 angle;
@@ -56,6 +61,10 @@ int main(int argc, char **argv) {
 	delete sp;
 	delete engine;
 	delete dc;
+	delete cm;
+	delete cmp1;
+	delete cmp2;
+	delete cmp3;
 
 	// return success
 	return 0;
@@ -64,7 +73,7 @@ int main(int argc, char **argv) {
 void keyboardCallback(int key, int state) 
 {
 
-	const int * datacount = dc->GetDataCount();
+	const int * datacount = dc->getDataCount();
 	// increase and decrease tessellation levels
 	if(key == GLFW_KEY_RIGHT && state == GLFW_PRESS) {
 		if(year < datacount[1])
@@ -105,11 +114,23 @@ void myInitFunc(void)
 	dl->addAttribFromFile("population", "data/total_population.csv");
 	dl->addAttribFromFile("broadband", "data/fixed_broadband_connections.csv");
 	dc = dl->getDataCube();
-	dc->CalculateAttribRanges();
+	dc->calculateAttribRanges();
+
+	cm = new ColorMap();
+
+	cmp1 = new ColorMap::LinearPart(glm::vec3(1.0,0.0,0.0), glm::vec3(0.0,1.0,0.0));
+	cmp2 = new ColorMap::LinearPart(glm::vec3(0.0,1.0,0.0), glm::vec3(0.0,0.0,1.0));
+	cmp3 = new ColorMap::LinearPart(glm::vec3(0.0,0.0,1.0), glm::vec3(1.0,0.0,0.0));
+
+	cm->addPart(cmp1);
+	cm->addPart(cmp2);
+	cm->addPart(cmp3);
+	cm->setDataCube(dc);
+	cm->setAxis(0);
 	
-	glm::vec2 rangex = dc->GetAttribRange(0);
-	glm::vec2 rangey = dc->GetAttribRange(1);
-	glm::vec2 rangez = dc->GetAttribRange(2);
+	glm::vec2 rangex = dc->getAttribRange(0);
+	glm::vec2 rangey = dc->getAttribRange(1);
+	glm::vec2 rangez = dc->getAttribRange(2);
 
 	std::cout << "dc->GetAttribRange(0) = " << rangex[0] << " -> " << rangex[1] << std::endl;
 	std::cout << "dc->GetAttribRange(1) = " << rangey[0] << " -> " << rangey[1] << std::endl;
@@ -117,9 +138,11 @@ void myInitFunc(void)
 
 	sc = new SplitContainer(glm::vec2(0,WINDOW_WIDTH),glm::vec2(0, WINDOW_HEIGHT));
 	sp = new ScatterPlot(glm::vec2(1,1), glm::vec2(1,1));
+	
 	sp->setInput(dc);
 	sp->setYear(year);
-	sc->setTopChild(sp);
+	sp->setColorMap(cm);
+
 	sc->setBottomChild(sp);
 
 }
@@ -127,9 +150,8 @@ void myInitFunc(void)
 void myRenderFunc(void) 
 {
 	sc->render();
-	
-}
 
+}
 
 void myUpdateFunc(float dt)
 {

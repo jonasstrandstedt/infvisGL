@@ -15,6 +15,11 @@ void Plot::resize(glm::vec2 in_x, glm::vec2 in_y){
 }
 
 
+void Plot::setColorMap(ColorMap *c)
+{
+	colormap = c;
+}
+
 void Plot::setInput(DataCube *d) {
 	dc = d;
 }

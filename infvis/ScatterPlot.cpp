@@ -6,6 +6,8 @@ ScatterPlot::ScatterPlot(glm::vec2 in_x, glm::vec2 in_y) : Plot(in_x, in_y)
 	std::cout << "ScatterPlot::ScatterPlot()" << std::endl;
 	primitive = new gl4::Circle(1.0,100);
 	primitive->init();
+	year = 0;
+	colormap = 0;
 }
 ScatterPlot::~ScatterPlot()
 {
@@ -35,26 +37,31 @@ void ScatterPlot::render()
 	int colorLoc = glGetUniformLocation(program, "uniform_color");
 
 	float size = 200.0;
-	glm::vec3 color = glm::vec3(1.0,0.0,0.0);
+	glm::vec3 color = glm::vec3(1.0,1.0,1.0);
 	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
 	size = 1.0;
 
-	glm::vec2 rangex = dc->GetAttribRange(0);
-	glm::vec2 rangey = dc->GetAttribRange(1);
+	glm::vec2 rangex = dc->getAttribRange(0);
+	glm::vec2 rangey = dc->getAttribRange(1);
 
-	const int * datacount = dc->GetDataCount();
+	const int * datacount = dc->getDataCount();
 
 
 	for (int i = 0; i < datacount[0]; ++i)
 	{
 		
-		float x = dc->GetItem(i, year, 0);
-		float y = dc->GetItem(i, year, 1);
+		float x = dc->getItem(i, year, 0);
+		float y = dc->getItem(i, year, 1);
 
 		float posx = (x - rangex[0]) / (rangex[1] - rangex[0]);
 		float posy = (y - rangey[0]) / (rangey[1] - rangey[0]);
 		size = (y - rangey[0]) / (rangey[1] - rangey[0])* 0.2;
+
+		if (colormap != 0)
+		{
+			color = colormap->map(x);
+		}
 		//std::cout << "xy = (" << x << ", " << y << ")" << std::endl;
 		//std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
 

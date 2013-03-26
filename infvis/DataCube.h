@@ -11,17 +11,18 @@ public:
 	~DataCube();
 
 
-	const int * GetDataCount();
-	float GetItem(int index, int time, int attrib);
-	const std::string & GetAttribName(int attrib);
-	const std::string & GetEntryName(int index);
-	const glm::vec2 & GetAttribRange(int attribute);
+	const int * getDataCount();
+	float getItem(int index, int time, int attrib);
+	const std::string & getAttribName(int attrib);
+	const std::string & getEntryName(int index);
+	const glm::vec2 & getAttribRange(int attribute);
+	
 
-	void SetItem(int index, int time, int attrib, float value);
-	void SetAtrribName(int attrib, const std::string &name);
-	void SetEntryName(int index, const std::string &name);
+	void setItem(int index, int time, int attrib, float value);
+	void setAtrribName(int attrib, const std::string &name);
+	void setEntryName(int index, const std::string &name);
 
-	void CalculateAttribRanges();
+	void calculateAttribRanges();
 
 private:
 	float * data;
