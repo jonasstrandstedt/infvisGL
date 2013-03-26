@@ -10,6 +10,7 @@ class ColorMap
 public:
 	class Part;
 	class LinearPart;
+	class HSVPart;
 
 	ColorMap();
 	~ColorMap();
@@ -46,4 +47,15 @@ public:
 private:
 	glm::vec3 lowColor;
 	glm::vec3 highColor;
+};
+
+class ColorMap::HSVPart : public ColorMap::Part
+{
+public:
+	HSVPart(const glm::vec3 &_low, const glm::vec3 &_high);
+
+	glm::vec3 map(float _value);
+private:
+	glm::vec3 lowHSV;
+	glm::vec3 highHSV;
 };

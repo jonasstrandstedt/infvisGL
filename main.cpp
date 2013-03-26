@@ -17,7 +17,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 DataCube * dc;
 DataLoader * dl;
 ColorMap * cm;
-ColorMap::LinearPart * cmp1;
+ColorMap::HSVPart * cmp1;
 ColorMap::LinearPart * cmp2;
 ColorMap::LinearPart * cmp3;
 
@@ -157,14 +157,14 @@ void myInitFunc(void)
 
 	cm = new ColorMap();
 
-	cmp1 = new ColorMap::LinearPart(glm::vec3(1.0,0.0,0.0), glm::vec3(0.0,1.0,0.0));
+	cmp1 = new ColorMap::HSVPart(glm::vec3(0.0,0.5,0.5), glm::vec3(360.0,0.5,0.5));
 	cmp2 = new ColorMap::LinearPart(glm::vec3(0.0,1.0,0.0), glm::vec3(0.0,0.0,1.0));
 	cmp3 = new ColorMap::LinearPart(glm::vec3(0.0,0.0,1.0), glm::vec3(1.0,0.0,0.0));
 
 	cm->addPart(cmp1);
-	cm->addPart(cmp2);
-	cm->addPart(cmp3);
-	cm->setDataCube(dc);
+	//cm->addPart(cmp2);
+	//cm->addPart(cmp3);
+	//cm->setDataCube(dc);
 	cm->setAxis(0);
 	
 	glm::vec2 rangex = dc->getAttribRange(0);
@@ -236,29 +236,24 @@ void scatterPlot(void)
 	glm::vec2 rangey = dc->getAttribRange(1);
 
 	const int * datacount = dc->getDataCount();
-	for (int i = 0; i < datacount[0]; ++i)
+	for (int i = 0; i < 30; ++i)
 	{
-		float x = dc->getItem(i, year, 0);
-		float y = dc->getItem(i, year, 1);
+		float x = (float)i / 29.0;
+		float y = 0.5;
 
-		float posx = (x - rangex[0]) / (rangex[1] - rangex[0]) * WINDOW_WIDTH;
-		float posy = (y - rangey[0]) / (rangey[1] - rangey[0]) * WINDOW_HEIGHT;
-		size = (y - rangey[0]) / (rangey[1] - rangey[0]) * 50.0;
+		size = 10.0;
 		//std::cout << "xy = (" << x << ", " << y << ")" << std::endl;
 		//std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
 
-		glm::vec3 position = glm::vec3(posx,posy,0);
+		glm::vec3 position = glm::vec3(x * WINDOW_WIDTH, y * WINDOW_HEIGHT,0);
 
-		float val = (x - rangex[0]) / (rangex[1] - rangex[0]);
-
-		//color = glm::vec3(1.0,0.0,0.0)*(1.0f - val) + glm::vec3(0.0,0.0,1.0)*val;
 		color = cm->map(x);
 
 		glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
 		glm::mat4 transform = glm::translate(glm::mat4(), position);
 		transform = glm::scale(transform, glm::vec3(size));
-		transform = glm::translate(transform, glm::vec3(-0.5, -0.5, 0.0));
+		//transform = glm::translate(transform, glm::vec3(-0.5, -0.5, 0.0));
 
 		engine->useOrthogonalProjection(transform);
 
