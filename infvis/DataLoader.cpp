@@ -46,7 +46,7 @@ DataCube * DataLoader::getDataCube()
 			size_t stoppos = line.find_first_of(";");
 			++cols;
 			while(startpos != std::string::npos && cols != 100) {
-				startpos = line.find_first_of(";", stoppos+1);
+				startpos = line.find_first_of(";", stoppos);
 				stoppos = line.find_first_of(";", startpos+1);
 				++cols;
 			}

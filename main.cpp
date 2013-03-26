@@ -112,7 +112,9 @@ void myInitFunc(void)
 	dl = new DataLoader();
 	dl->addAttribFromFile("fertility", "data/fertility_rate.csv");
 	dl->addAttribFromFile("population", "data/total_population.csv");
-	dl->addAttribFromFile("broadband", "data/fixed_broadband_connections.csv");
+	dl->addAttribFromFile("gdp", "data/gdp.csv");
+	dl->addAttribFromFile("life", "data/life_excpectancy_female.csv");
+	//dl->addAttribFromFile("broadband", "data/fixed_broadband_connections.csv");
 	dc = dl->getDataCube();
 	dc->calculateAttribRanges();
 
@@ -126,15 +128,17 @@ void myInitFunc(void)
 	cm->addPart(cmp2);
 	cm->addPart(cmp3);
 	cm->setDataCube(dc);
-	cm->setAxis(0);
+	cm->setAxis(2);
 	
 	glm::vec2 rangex = dc->getAttribRange(0);
 	glm::vec2 rangey = dc->getAttribRange(1);
 	glm::vec2 rangez = dc->getAttribRange(2);
+	glm::vec2 rangew = dc->getAttribRange(3);
 
 	std::cout << "dc->GetAttribRange(0) = " << rangex[0] << " -> " << rangex[1] << std::endl;
 	std::cout << "dc->GetAttribRange(1) = " << rangey[0] << " -> " << rangey[1] << std::endl;
 	std::cout << "dc->GetAttribRange(2) = " << rangez[0] << " -> " << rangez[1] << std::endl;
+	std::cout << "dc->GetAttribRange(3) = " << rangew[0] << " -> " << rangew[1] << std::endl;
 
 	sc = new SplitContainer(glm::vec2(0,WINDOW_WIDTH),glm::vec2(0, WINDOW_HEIGHT));
 	sp = new ScatterPlot(glm::vec2(1,1), glm::vec2(1,1));
@@ -142,6 +146,9 @@ void myInitFunc(void)
 	sp->setInput(dc);
 	sp->setYear(year);
 	sp->setColorMap(cm);
+	sp->setSizeIndex(1);
+	sp->setAxisIndex(AXIS_X, 0);
+	sp->setAxisIndex(AXIS_Y, 3);
 
 	sc->setBottomChild(sp);
 

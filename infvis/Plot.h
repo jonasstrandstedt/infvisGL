@@ -8,6 +8,12 @@
 #include <string>
 #include <glm/glm.hpp>
 
+enum {
+	AXIS_X = 0,
+	AXIS_Y,
+	AXIS_Z
+};
+
 class Plot: public Container
 {
 public:

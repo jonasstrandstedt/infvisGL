@@ -15,9 +15,15 @@ public:
 
 	void setYear(int y);
 	void render();
+
+	void setSizeIndex(int sa);
+	void setAxisIndex(int axis, int index);
 protected:
 private:
 
+	int x_index;
+	int y_index;
+	int sizeIndex;
 	int year;
 	gl4::Circle *primitive;
 };

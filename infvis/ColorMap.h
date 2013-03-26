@@ -19,6 +19,7 @@ public:
 
 	void setDataCube(DataCube * _cube);
 	void setAxis(int _axis);
+	int getAxis();
 
 	glm::vec3 map(float _value);
 private:

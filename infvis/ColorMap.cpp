@@ -42,6 +42,12 @@ void ColorMap::setAxis(int _axis)
 	}
 }
 
+
+int ColorMap::getAxis()
+{
+	return axis;
+}
+
 glm::vec3 ColorMap::map(float _value)
 {
 	if(parts.size() > 0)

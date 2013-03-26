@@ -10,8 +10,6 @@ SplitContainer::~SplitContainer()
 {
 }
 
-
-
 void SplitContainer::setTopChild(Container *c)
 {
 	top = c;
