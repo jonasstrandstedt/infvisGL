@@ -52,6 +52,14 @@ void gl4::FBO::init(GLuint width, GLuint height, GLuint samples, GLuint textures
 	GLint MaxSamples;
 	glGetIntegerv(GL_MAX_SAMPLES, &MaxSamples);
 	std::cout << "   MaxSamples = " << MaxSamples << std::endl;
+	if (samples < 0)
+	{
+		samples = 0;
+	}
+	if (samples > MaxSamples)
+	{
+		samples = MaxSamples;
+	}
 	if ( samples > 0 && samples <= MaxSamples)
 	{
 		_multisampled = true;
@@ -187,16 +195,16 @@ void gl4::FBO::unbind() {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void gl4::FBO::clear() {
+void gl4::FBO::clear(glm::vec4 color) {
 	glBindFramebuffer(GL_FRAMEBUFFER, _fboId);
-	glClearColor(0, 0, 0, 0);
+	glClearColor(color[0], color[1], color[2], color[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	if (_multisampled)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, _fboId_multisampled);
-		glClearColor(0, 0, 0, 0);
+		glClearColor(color[0], color[1], color[2], color[3]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}

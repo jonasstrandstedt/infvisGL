@@ -153,7 +153,6 @@ void gl4::Engine::useOrthogonalProjection(glm::mat4 transform)
 
 void gl4::Engine::render() {
 	while(_doRender) {
-
 		// update time variables
 		double t = glfwGetTime();
 		float dt = static_cast<float>(t - _t0);
@@ -164,10 +163,11 @@ void gl4::Engine::render() {
 			_updateFunc(dt);
 		}
 		_t0 = t;
-
+		
 		// Clear the default color buffer
 		glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
 		
 		if (_renderFunc != 0)
 		{

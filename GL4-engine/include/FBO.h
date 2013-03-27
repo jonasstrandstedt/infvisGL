@@ -12,6 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
+#include <glm/glm.hpp>
 
 
 namespace gl4
@@ -25,7 +26,7 @@ class FBO
 		void init(GLuint width, GLuint height, GLuint samples = 0, GLuint textures = 1);
 		void bind();
 		void unbind();
-		void clear();
+		void clear(glm::vec4 color = glm::vec4(0,0,0,0));
 
 		GLuint getTexture(GLuint i = 0);
 		void bindTextures();
