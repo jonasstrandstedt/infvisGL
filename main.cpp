@@ -74,7 +74,7 @@ void keyboardCallback(int key, int state)
 	const int * datacount = dc->getDataCount();
 	// increase and decrease tessellation levels
 	if(key == GLFW_KEY_RIGHT && state == GLFW_PRESS) {
-		if(year < datacount[1])
+		if(year < datacount[1]-1)
 			year++;
 	}
 	if(key == GLFW_KEY_LEFT && state == GLFW_PRESS) {
@@ -115,6 +115,7 @@ void myInitFunc(void)
 	//dl->addAttribFromFile("broadband", "data/fixed_broadband_connections.csv");
 	dc = dl->getDataCube();
 	dc->calculateAttribRanges();
+	dc->interpolateAndClamp();
 
 	cm = new ColorMap();
 
@@ -149,6 +150,7 @@ void myInitFunc(void)
 	sp->setAxisIndex(AXIS_Y, 3);
 
 	sc->setBottomChild(sp);
+	
 
 }
 

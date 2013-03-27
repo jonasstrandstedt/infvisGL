@@ -51,8 +51,8 @@ DataCube * DataLoader::getDataCube()
 				++cols;
 			}
 			t = cols - 2;
-    		file->close();
-    		delete file;
+			file->close();
+			delete file;
 
 			std::cout << "Creating DataCube("<< items << "," << t << "," << attribs << ")" << std::endl;
 			DataCube * d = new DataCube(items,t,attribs);
@@ -82,13 +82,17 @@ DataCube * DataLoader::getDataCube()
 							{
 								
 	 							//std::cout << "val (string) = " << val << std::endl;
-	 							for (int n = 0; n < val.length(); ++n) {
-	 							    if (val[n] == ',')
-	 							      val[n] = '.';
-	 							  }
-								float fval = std::atof(val.c_str());
-	 							//std::cout << "val (float)  = " << fval << std::endl;
-								d->setItem(item-1, column -2, i, fval);
+								if (val.length() > 0)
+								{
+									for (int n = 0; n < val.length(); ++n) {
+										if (val[n] == ',')
+											val[n] = '.';
+									}
+									float fval = std::atof(val.c_str());
+	 								 							//std::cout << "val (float)  = " << fval << std::endl;
+									d->setItem(item-1, column -2, i, fval);
+								}
+								
 							}
 
 
@@ -102,7 +106,7 @@ DataCube * DataLoader::getDataCube()
 
 				}
 				file->close();
- 		   		delete file;
+				delete file;
 			}
 			
 			

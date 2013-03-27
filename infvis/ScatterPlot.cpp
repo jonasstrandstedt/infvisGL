@@ -77,38 +77,41 @@ void ScatterPlot::render()
 
 	for (int i = 0; i < datacount[0]; ++i)
 	{
-		
-		float x = dc->getItem(i, year, x_index);
-		float y = dc->getItem(i, year, y_index);
-		float sizeval = dc->getItem(i, year, sizeIndex);
-
-		float posx = (x - rangex[0]) / (rangex[1] - rangex[0]);
-		float posy = (y - rangey[0]) / (rangey[1] - rangey[0]);
-
-		float area = 1.0f + (sizeval - sizeRange[0]) / (sizeRange[1] - sizeRange[0])*10;
-		float size = sqrt(PI/1.0)*area;
-
-		if (colormap != 0)
+		if (dc->isSetAll(i, year))
 		{
-			float colorval = dc->getItem(i, year, colormap->getIndex());
-			color = colormap->map(colorval);
+			float x = dc->getItem(i, year, x_index);
+			float y = dc->getItem(i, year, y_index);
+			float sizeval = dc->getItem(i, year, sizeIndex);
+
+			float posx = (x - rangex[0]) / (rangex[1] - rangex[0]);
+			float posy = (y - rangey[0]) / (rangey[1] - rangey[0]);
+
+			float area = 1.0f + (sizeval - sizeRange[0]) / (sizeRange[1] - sizeRange[0])*10;
+			float size = sqrt(PI/1.0)*area;
+
+			if (colormap != 0)
+			{
+				float colorval = dc->getItem(i, year, colormap->getIndex());
+				color = colormap->map(colorval);
+			}
+			//std::cout << "xy = (" << x << ", " << y << ")" << std::endl;
+			//std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
+
+			glm::vec3 position = glm::vec3(posx,posy,0);
+			
+			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+
+			glm::mat4 transform = glm::translate(glm::mat4(), position);
+			transform = glm::scale(transform, glm::vec3(size));
+			transform = glm::scale(transform, glm::vec3(pixelScale));
+			transform = glm::scale(transform, glm::vec3(scalex, scaley, 1.0));
+
+			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_PROJECTION), 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
+			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
+
+			primitive->render();
 		}
-		//std::cout << "xy = (" << x << ", " << y << ")" << std::endl;
-		//std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
-
-		glm::vec3 position = glm::vec3(posx,posy,0);
 		
-		glUniform3fv(colorLoc, 1, glm::value_ptr(color));
-
-		glm::mat4 transform = glm::translate(glm::mat4(), position);
-		transform = glm::scale(transform, glm::vec3(size));
-		transform = glm::scale(transform, glm::vec3(pixelScale));
-		transform = glm::scale(transform, glm::vec3(scalex, scaley, 1.0));
-
-		glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_PROJECTION), 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
-		glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
-
-		primitive->render();
 
 	}
 

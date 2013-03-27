@@ -17,6 +17,8 @@ public:
 	const std::string & getEntryName(int index);
 	const glm::vec2 & getAttribRange(int attribute);
 	
+	bool isSet(int index, int time, int attrib);
+	bool isSetAll(int index, int time);
 
 	void setItem(int index, int time, int attrib, float value);
 	void setAtrribName(int attrib, const std::string &name);
@@ -24,8 +26,11 @@ public:
 
 	void calculateAttribRanges();
 
+	void interpolateAndClamp();
+
 private:
 	float * data;
+	bool * dataExist;
 
 	int dataCount[3];
 	int totalDataCount;
