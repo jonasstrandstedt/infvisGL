@@ -76,15 +76,18 @@ void keyboardCallback(int key, int state)
 	if(key == GLFW_KEY_RIGHT && state == GLFW_PRESS) {
 		if(year < datacount[1]-1)
 			year++;
+
+		sp->setYear(year);
+		std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 	}
 	if(key == GLFW_KEY_LEFT && state == GLFW_PRESS) {
 		if(year > 0)
 			year--;
+
+		sp->setYear(year);
+		std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 	}
 
-	sp->setYear(year);
-
-	std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 
 }
 
@@ -140,7 +143,7 @@ void myInitFunc(void)
 	std::cout << "dc->GetAttribRange(3) = " << rangew[0] << " -> " << rangew[1] << std::endl;
 
 	sc = new SplitContainer(glm::vec2(0,WINDOW_WIDTH),glm::vec2(0, WINDOW_HEIGHT));
-	sp = new ScatterPlot(glm::vec2(1,1), glm::vec2(1,1));
+	sp = new ScatterPlot();
 	
 	sp->setInput(dc);
 	sp->setYear(year);
@@ -151,7 +154,7 @@ void myInitFunc(void)
 
 	sc->setBottomChild(sp);
 	
-
+	sp->invalidate();
 }
 
 void myRenderFunc(void) 

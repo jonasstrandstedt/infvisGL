@@ -1,5 +1,15 @@
 #include "ScatterPlot.h"
 
+ScatterPlot::ScatterPlot() : Plot()
+{
+	std::cout << "ScatterPlot::ScatterPlot()" << std::endl;
+	primitive = new gl4::Circle(1.0,100);
+	primitive->init();
+	year = 0;
+	x_index = 0;
+	y_index = 0;
+	sizeIndex = 0;
+}
 
 ScatterPlot::ScatterPlot(glm::vec2 in_x, glm::vec2 in_y) : Plot(in_x, in_y)
 {
@@ -7,7 +17,6 @@ ScatterPlot::ScatterPlot(glm::vec2 in_x, glm::vec2 in_y) : Plot(in_x, in_y)
 	primitive = new gl4::Circle(1.0,100);
 	primitive->init();
 	year = 0;
-	colormap = 0;
 	x_index = 0;
 	y_index = 0;
 	sizeIndex = 0;
@@ -21,11 +30,13 @@ ScatterPlot::~ScatterPlot()
 void ScatterPlot::setYear(int y) 
 {
 	year = y;
+	invalidate();
 }
 
 void ScatterPlot::setSizeIndex(int sa)
 {
 	sizeIndex = sa;
+	invalidate();
 }
 
 void ScatterPlot::setAxisIndex(int axis, int index)
@@ -37,11 +48,12 @@ void ScatterPlot::setAxisIndex(int axis, int index)
 	{
 		y_index = index;
 	}
+	invalidate();
 }
 
-void ScatterPlot::render()
+void ScatterPlot::renderPlot()
 {
-	glViewport(	x[0],y[0],x[1] - x[0], y[1] - y[0]);
+	std::cout << "ScatterPlot::render()" << std::endl;
 
 	float scalex = x[1] - x[0];
 	float scaley = y[1] - y[0];
@@ -57,7 +69,7 @@ void ScatterPlot::render()
 		scaley = scalex / scaley;
 		scalex = 1.0;
 	}
-	
+
 
 	gl4::ShaderManager::getInstance()->bindShader("uniform_color");
 	GLuint program = gl4::ShaderManager::getInstance()->getShaderProgram("uniform_color");
@@ -66,14 +78,12 @@ void ScatterPlot::render()
 	glm::vec3 color = glm::vec3(1.0,1.0,1.0);
 	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
-
 	glm::vec2 rangex = dc->getAttribRange(x_index);
 	glm::vec2 rangey = dc->getAttribRange(y_index);
 	glm::vec2 sizeRange = dc->getAttribRange(sizeIndex);
 
 	const int * datacount = dc->getDataCount();
 	const float PI = 3.14159265;
-
 
 	for (int i = 0; i < datacount[0]; ++i)
 	{
@@ -94,11 +104,11 @@ void ScatterPlot::render()
 				float colorval = dc->getItem(i, year, colormap->getIndex());
 				color = colormap->map(colorval);
 			}
-			//std::cout << "xy = (" << x << ", " << y << ")" << std::endl;
-			//std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
+				//std::cout << "xy = (" << x << ", " << y << ")" << std::endl;
+				//std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
 
 			glm::vec3 position = glm::vec3(posx,posy,0);
-			
+
 			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
 			glm::mat4 transform = glm::translate(glm::mat4(), position);
@@ -111,8 +121,7 @@ void ScatterPlot::render()
 
 			primitive->render();
 		}
-		
+
 
 	}
-
 }
