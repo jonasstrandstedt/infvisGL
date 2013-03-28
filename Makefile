@@ -30,6 +30,9 @@ OBJECTS += GL4-engine/src/TextureManager.o
 OBJECTS += GL4-engine/src/Sphere.o
 OBJECTS += GL4-engine/src/Circle.o
 OBJECTS += GL4-engine/src/Geometry.o
+
+OBJECTS += GL4-engine/src/FontManager.o
+
 OBJECTS += infvis/DataLoader.o
 OBJECTS += infvis/DataCube.o
 OBJECTS += infvis/Container.o
