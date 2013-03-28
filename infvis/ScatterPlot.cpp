@@ -71,7 +71,7 @@ void ScatterPlot::renderPlot()
 	const float scatterplot_width = container_width - padding_x_left - padding_x_right; 
 	const float scatterplot_height = container_height - padding_y_bottom - padding_y_top;
 
-	glm::vec2 scale = glm::vec2(1.0f/container_width, 1.0f / container_height);
+	const glm::vec2 scale = glm::vec2(1.0f/container_width, 1.0f / container_height);
 
 	gl4::ShaderManager::getInstance()->bindShader("uniform_color");
 	GLuint program = gl4::ShaderManager::getInstance()->getShaderProgram("uniform_color");
