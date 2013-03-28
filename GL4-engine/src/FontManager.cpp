@@ -51,6 +51,7 @@ void FontManager::render(float width, float height)
 
 	width = 1024.0f;
 	height = 768.0f;
+	glViewport(0, 0, width, height);
 
 	glm::mat4 Orthogonal = glm::ortho(0.0f, width, 0.0f, height, 0.1f, 100.0f);
 	glm::mat4 OrthogonalView = glm::lookAt(		glm::vec3(0,0,1), // Camera pos
@@ -64,9 +65,9 @@ void FontManager::render(float width, float height)
 	float scalex = 1.0;
 	float scaley = 1.0;
 
-	gl4::TextureManager::getInstance()->bindTexture("fontmap", 0);
 
 	gl4::ShaderManager::getInstance()->bindShader("text");
+	gl4::TextureManager::getInstance()->bindTexture("fontmap", 0);
 	GLuint program = gl4::ShaderManager::getInstance()->getShaderProgram("text");
 	int colorLoc = glGetUniformLocation(program, "text");
 
@@ -77,13 +78,27 @@ void FontManager::render(float width, float height)
 
 	glEnable(GL_BLEND);
 
+	GLboolean params = false;
+	glGetBooleanv(GL_DEPTH_TEST, &params);
+	if (params)
+	{
+		glDisable (GL_DEPTH_TEST);
+	}
+
 	// Lite oklart vilken blend som krävs
-        //glBlendEquation(GL_FUNC_ADD, GL_FUNC_ADD);
-        glBlendFunc(GL_ONE, GL_DST_ALPHA);
+    //glBlendEquation(GL_FUNC_ADD, GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 	buffer->render();
 
 	glDisable(GL_BLEND);
+	//glEnable (GL_DEPTH_TEST);
+
+	if (params)
+	{
+		glEnable (GL_DEPTH_TEST);
+	}
+
 }
 
 void FontManager::addText(float x, float y, const char * text, float fontSize, const glm::vec3 &color)

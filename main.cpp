@@ -179,7 +179,7 @@ void myInitFunc(void)
 
 void myRenderFunc(void) 
 {
-	//sc->render();
+	sc->render();
 
 	FontManager::getInstance()->render(1.0,1.0);
 }
