@@ -25,11 +25,13 @@ out vec4 diffuse;
 
 void main()
 {
-
 	float dist = texture(texture1, st).r;
 
 	float width = fwidth(dist);
 	float alpha = smoothstep(0.5-width, 0.5+width, dist);
 
-	diffuse = vec4(color.rgb, alpha);
+	if(alpha < 0.2)
+		discard;
+
+	diffuse = vec4(color.rgb*alpha, alpha);
 }
