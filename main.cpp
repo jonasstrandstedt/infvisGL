@@ -8,6 +8,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include "Engine.h"
+
 #include "infvis/SplitContainer.h"
 #include "infvis/ScatterPlot.h"
 
@@ -87,8 +88,6 @@ void keyboardCallback(int key, int state)
 		sp->setYear(year);
 		std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 	}
-
-
 }
 
 
@@ -109,6 +108,9 @@ void myInitFunc(void)
 
 	gl4::Shader *s3 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_uniform_color.glsl");
 	gl4::ShaderManager::getInstance()->addShaderProgram("uniform_color", s3);
+
+	gl4::Shader *s4 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_text.glsl");
+	gl4::ShaderManager::getInstance()->addShaderProgram("text", s4);
 
 	dl = new DataLoader();
 	dl->addAttribFromFile("fertility", "data/fertility_rate.csv");
@@ -159,7 +161,9 @@ void myInitFunc(void)
 
 void myRenderFunc(void) 
 {
-	sc->render();
+	//sc->render();
+
+	FontManager::getInstance()->render(1.0,1.0);
 }
 
 void myUpdateFunc(float dt)
