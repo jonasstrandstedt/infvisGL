@@ -94,8 +94,10 @@ void Plot::setBackgroundColor(glm::vec4 bc)
 
 void Plot::render()
 {
-	//std::cout << "Plot::render()" << std::endl;
-	if (! isValid() || renders < 2)
+	// viewport for the fbo, lower bottom corner and the size of the fbo
+	glViewport(0, 0, x[1] - x[0], y[1] - y[0]);
+	
+	if ( ! isValid() || renders < 2 )
 	{
 		_fbo->clear(backgroundColor);
 		_fbo->bind();
@@ -107,7 +109,9 @@ void Plot::render()
 		setValid();
 	} 
 
+	// viewport on screen, position and size for quad
 	glViewport(x[0], y[0], x[1] - x[0], y[1] - y[0]);
+
 	// start stage 2
 	gl4::ShaderManager::getInstance()->bindShader("textur");
 
@@ -125,6 +129,7 @@ void Plot::render()
 	gl4::ShaderManager::getInstance()->unbindShader();
 
 	++renders;
+
 }
 
 

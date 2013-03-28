@@ -30,13 +30,13 @@ public:
 	void setColorMap(ColorMap *c);
 	void invalidate();
 	bool isValid();
+	void setBackgroundColor(glm::vec4 bc);
 protected:
 	DataCube *dc;
 	ColorMap *colormap;
 
 	virtual void renderPlot() = 0;
 
-	void setBackgroundColor(glm::vec4 bc);
 	void setValid();
 private:
 	glm::vec4 backgroundColor;

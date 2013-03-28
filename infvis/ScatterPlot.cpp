@@ -5,6 +5,8 @@ ScatterPlot::ScatterPlot() : Plot()
 	std::cout << "ScatterPlot::ScatterPlot()" << std::endl;
 	primitive = new gl4::Circle(1.0,100);
 	primitive->init();
+	obj = new gl4::VBO();
+	obj->init();
 	year = 0;
 	x_index = 0;
 	y_index = 0;
@@ -55,6 +57,13 @@ void ScatterPlot::renderPlot()
 {
 	std::cout << "ScatterPlot::render()" << std::endl;
 
+	// settings
+	const int * datacount = dc->getDataCount();
+	const float padding_x = 10.0;
+	const float padding_y = 10.0;
+	const float PI = 3.14159265;
+
+	// start stage 2
 	float scalex = x[1] - x[0];
 	float scaley = y[1] - y[0];
 	float pixelScale;
@@ -82,8 +91,6 @@ void ScatterPlot::renderPlot()
 	glm::vec2 rangey = dc->getAttribRange(y_index);
 	glm::vec2 sizeRange = dc->getAttribRange(sizeIndex);
 
-	const int * datacount = dc->getDataCount();
-	const float PI = 3.14159265;
 
 	for (int i = 0; i < datacount[0]; ++i)
 	{
@@ -107,7 +114,7 @@ void ScatterPlot::renderPlot()
 				//std::cout << "xy = (" << x << ", " << y << ")" << std::endl;
 				//std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
 
-			glm::vec3 position = glm::vec3(posx,posy,0);
+			glm::vec3 position = glm::vec3(posx+ padding_x*pixelScale,posy+ padding_y*pixelScale,0);
 
 			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
@@ -124,4 +131,35 @@ void ScatterPlot::renderPlot()
 
 
 	}
+
+
+	glm::mat4 transform = glm::mat4();
+	transform = glm::translate(transform, glm::vec3(padding_x*pixelScale,padding_y*pixelScale,0.9));
+	transform = glm::scale(transform, glm::vec3(x[1] - x[0] - 2.0*padding_x,1,0));
+	transform = glm::scale(transform, glm::vec3(pixelScale));
+	transform = glm::scale(transform, glm::vec3(scalex, scaley, 0.0));
+
+	gl4::ShaderManager::getInstance()->bindShader("color");
+
+	// orthogonal projection
+	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_PROJECTION), 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
+	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
+
+	obj->render();
+
+	transform = glm::mat4();
+	transform = glm::translate(transform, glm::vec3(padding_x*pixelScale,padding_y*pixelScale,0));
+	transform = glm::scale(transform, glm::vec3(1,y[1] - y[0] - 2.0*padding_y ,0));
+	transform = glm::scale(transform, glm::vec3(pixelScale));
+	transform = glm::scale(transform, glm::vec3(scalex, scaley, 0.0));
+
+	gl4::ShaderManager::getInstance()->bindShader("color");
+
+		// orthogonal projection
+	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_PROJECTION), 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
+	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
+
+	obj->render();
+
+
 }

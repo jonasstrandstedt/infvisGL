@@ -10,6 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "Engine.h"
 #include "infvis/SplitContainer.h"
 #include "infvis/ScatterPlot.h"
+#include "infvis/TreemapPlot.h"
 
 #include "infvis/DataCube.h"
 #include "infvis/DataLoader.h"
@@ -27,6 +28,8 @@ glm::vec2 angle;
 int year = 40;
 SplitContainer *sc;
 ScatterPlot *sp;
+ScatterPlot *sp2;
+TreemapPlot *tp;
 
 void keyboardCallback(int key, int state);
 void myRenderFunc(void);
@@ -78,6 +81,7 @@ void keyboardCallback(int key, int state)
 			year++;
 
 		sp->setYear(year);
+		sp2->setYear(year);
 		std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 	}
 	if(key == GLFW_KEY_LEFT && state == GLFW_PRESS) {
@@ -85,6 +89,7 @@ void keyboardCallback(int key, int state)
 			year--;
 
 		sp->setYear(year);
+		sp2->setYear(year);
 		std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 	}
 
@@ -143,8 +148,8 @@ void myInitFunc(void)
 	std::cout << "dc->GetAttribRange(3) = " << rangew[0] << " -> " << rangew[1] << std::endl;
 
 	sc = new SplitContainer(glm::vec2(0,WINDOW_WIDTH),glm::vec2(0, WINDOW_HEIGHT));
-	sp = new ScatterPlot();
 	
+	sp = new ScatterPlot();
 	sp->setInput(dc);
 	sp->setYear(year);
 	sp->setColorMap(cm);
@@ -152,9 +157,22 @@ void myInitFunc(void)
 	sp->setAxisIndex(AXIS_X, 0);
 	sp->setAxisIndex(AXIS_Y, 3);
 
-	sc->setBottomChild(sp);
+	sp2 = new ScatterPlot();
+	sp2->setInput(dc);
+	sp2->setYear(year);
+	sp2->setColorMap(cm);
+	sp2->setSizeIndex(1);
+	sp2->setAxisIndex(AXIS_X, 0);
+	sp2->setAxisIndex(AXIS_Y, 3);
+	sp2->setBackgroundColor(glm::vec4(0,0,0,1));
+
+
+	tp = new TreemapPlot();
+	tp->setInput(dc);
 	
-	sp->invalidate();
+	
+	sc->setTopChild(sp);
+	sc->setBottomChild(tp);
 }
 
 void myRenderFunc(void) 
