@@ -39,6 +39,7 @@ OBJECTS += infvis/Container.o
 OBJECTS += infvis/SplitContainer.o
 OBJECTS += infvis/Plot.o
 OBJECTS += infvis/ScatterPlot.o
+OBJECTS += infvis/TreemapPlot.o
 OBJECTS += infvis/ColorMap.o
 
 # Name the output file, if changed then the sgct_sim.sh script needs to be edited as well
