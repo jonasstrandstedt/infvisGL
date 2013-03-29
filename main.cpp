@@ -17,6 +17,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "infvis/DataLoader.h"
 #include "infvis/ColorMap.h"
 
+#include "infvis/Assert.h"
+
 DataCube * dc;
 DataLoader * dl;
 ColorMap * cm;

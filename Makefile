@@ -41,6 +41,7 @@ OBJECTS += infvis/Plot.o
 OBJECTS += infvis/ScatterPlot.o
 OBJECTS += infvis/TreemapPlot.o
 OBJECTS += infvis/ColorMap.o
+OBJECTS += infvis/Assert.o
 
 # Name the output file, if changed then the sgct_sim.sh script needs to be edited as well
 OUTPUT ?= Program
@@ -52,7 +53,7 @@ endif
 FLAGS ?= -lpng
 
 # Compiler flags for all objects
-CXXFLAGS ?= 
+CXXFLAGS ?=
 
 # include paths, specified with -isystem instead of -I due to -pedantic compiler when TEST is specified
 INCPATH ?= -isystem"GL4-engine/include"
@@ -70,6 +71,9 @@ ifdef OPENGL
 		FLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW -L"/usr/X11/lib/"
 	else ifeq ($(OS),MinGW)
 		FLAGS += -lglfw
+	else
+		MESSAGE += for other(win32!)
+		FLAGS += -lz -lglfw -lglew32 -lopengl32
 	endif
 endif
 
