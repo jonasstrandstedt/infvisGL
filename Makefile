@@ -41,7 +41,6 @@ OBJECTS += infvis/Plot.o
 OBJECTS += infvis/ScatterPlot.o
 OBJECTS += infvis/TreemapPlot.o
 OBJECTS += infvis/ColorMap.o
-OBJECTS += infvis/Assert.o
 
 # Name the output file, if changed then the sgct_sim.sh script needs to be edited as well
 OUTPUT ?= Program
