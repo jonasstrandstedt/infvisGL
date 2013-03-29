@@ -82,7 +82,7 @@ void keyboardCallback(int key, int state)
 			year++;
 
 		sp->setYear(year);
-		sp2->setYear(year);
+		tp->setYear(year);
 		std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 	}
 	if(key == GLFW_KEY_LEFT && state == GLFW_PRESS) {
@@ -90,7 +90,7 @@ void keyboardCallback(int key, int state)
 			year--;
 
 		sp->setYear(year);
-		sp2->setYear(year);
+		tp->setYear(year);
 		std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 	}
 }
@@ -137,7 +137,7 @@ void myInitFunc(void)
 	//cm->addPart(cmp2);
 	//cm->addPart(cmp3);
 	cm->setDataCube(dc);
-	cm->setIndex(2);
+	cm->setIndex(0);
 	
 	glm::vec2 rangex = dc->getAttribRange(0);
 	glm::vec2 rangey = dc->getAttribRange(1);
@@ -171,6 +171,9 @@ void myInitFunc(void)
 
 	tp = new TreemapPlot();
 	tp->setInput(dc);
+	tp->setSizeIndex(1);
+	tp->setGroupIndex(3);
+	tp->setColorMap(cm);
 	
 	
 	sc->setTopChild(sp);
@@ -181,7 +184,7 @@ void myRenderFunc(void)
 {
 	sc->render();
 
-	FontManager::getInstance()->render(1.0,1.0);
+	//FontManager::getInstance()->render(WINDOW_WIDTH,WINDOW_HEIGHT);
 }
 
 void myUpdateFunc(float dt)
