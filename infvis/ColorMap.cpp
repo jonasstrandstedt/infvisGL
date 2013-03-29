@@ -52,12 +52,13 @@ int ColorMap::getIndex()
 
 glm::vec3 ColorMap::map(float _value)
 {
+	static const float epsilon = 1.0e-5;
 	if(parts.size() > 0)
 	{
 		// Remap value to [0-1]
 		_value = (_value - range[0]) / (range[1] - range[0]);
 
-		int index = (int)( _value * 0.99999 * (float)(parts.size()) );
+		int index = (int)( _value * (1.0-epsilon) * (float)(parts.size()) );
 
 		float min = (float)index / (float)(parts.size());
 		float max = (float)(index+1) / (float)(parts.size());
@@ -107,11 +108,11 @@ glm::vec3 ColorMap::HSVPart::map(float _value)
 {
 	glm::vec3 hsv = lowHSV*(1.0f-_value) + highHSV * _value;
 
-	float h = fmodf(hsv.x, 360.0);
+	float h = fmodf(hsv.x, 360.0f);
 
 	float C = hsv.y * hsv.z;
-	float H = h/60.0;
-	float X = C * (1.0 - glm::abs(fmodf(H,2.0) - 1.0));
+	float H = h/60.0f;
+	float X = C * (1.0f - glm::abs(fmodf(H,2.0f) - 1.0f));
 
 	glm::vec3 rgb;
 

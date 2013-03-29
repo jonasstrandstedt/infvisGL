@@ -30,8 +30,8 @@ void main()
 	float width = fwidth(dist);
 	float alpha = smoothstep(0.5-width, 0.5+width, dist);
 
-	if(alpha < 0.2)
-		discard;
+	//if(alpha < 0.01)
+	//	discard;
 
-	diffuse = vec4(color.rgb*alpha, alpha);
+	diffuse = vec4(color.rgb, alpha*color.a);
 }
