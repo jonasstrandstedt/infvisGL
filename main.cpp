@@ -117,6 +117,9 @@ void myInitFunc(void)
 	gl4::Shader *s4 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_text.glsl");
 	gl4::ShaderManager::getInstance()->addShaderProgram("text", s4);
 
+	gl4::Shader *s5 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_black.glsl");
+	gl4::ShaderManager::getInstance()->addShaderProgram("black", s5);
+
 	dl = new DataLoader();
 	dl->addAttribFromFile("fertility", "data/fertility_rate.csv");
 	dl->addAttribFromFile("population", "data/total_population.csv");
