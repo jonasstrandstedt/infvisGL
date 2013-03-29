@@ -65,7 +65,7 @@ ifdef OPENGL
 		INCPATH += -isystem"/usr/X11/include"
 		FLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW -L"/usr/X11/lib/"
 	else ifeq ($(OS),MinGW)
-		FLAGS += -lglfw 
+		FLAGS += -lglfw
 	endif
 endif
 
