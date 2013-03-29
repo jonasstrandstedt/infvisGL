@@ -64,7 +64,7 @@ OPENGL=1
 ifdef OPENGL
 	MESSAGE += OpenGL,
 	ifeq ($(OS),Linux)
-		FLAGS += -lglfw -lGL -lGLU -lGLEW
+		FLAGS += -lglfw -lGLU -lGLEW
 	else ifeq ($(OS),Darwin)
 		INCPATH += -isystem"/usr/X11/include"
 		FLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW -L"/usr/X11/lib/"

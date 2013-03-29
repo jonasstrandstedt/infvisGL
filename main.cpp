@@ -184,7 +184,17 @@ void myRenderFunc(void)
 {
 	sc->render();
 
-	//FontManager::getInstance()->render(WINDOW_WIDTH,WINDOW_HEIGHT);
+	FontManager * fmgr = FontManager::getInstance();
+
+	fmgr->printText(50,60,"Bra skit lr?",16.0);
+	fmgr->printText(50,48,"Skit snack!",16.0);
+
+	fmgr->printText(250,250,"RED AND BIG", 128.0, glm::vec4(1.0,0.0,0.0,1.0));
+
+	static const char * text = "This is the tale of a little \nbastard who lived somewhere";
+
+	fmgr->printText(100,500,text,32.0, glm::vec4(0.0,0.0,0.0,1.0));
+	fmgr->printText(100,400,text,16.0, glm::vec4(0.0,0.0,0.0,1.0));
 }
 
 void myUpdateFunc(float dt)

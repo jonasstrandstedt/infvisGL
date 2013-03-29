@@ -10,7 +10,7 @@ inline void setVertex(	Vertex * v,
 						float x, float y, float z,
 						float nx, float ny, float nz,
 						float s, float t,
-						float r, float g, float b, float a,
+						const glm::vec4 &color,
 						float a0=0.0f, float a1=0.0f, float a2=0.0f,
 						float fa=0.0f)
 {
@@ -25,10 +25,10 @@ inline void setVertex(	Vertex * v,
 	v->tex[0] = s;
 	v->tex[1] = t;
 
-	v->color[0] = r;
-	v->color[1] = g;
-	v->color[2] = b;
-	v->color[3] = a;
+	v->color[0] = color.x;
+	v->color[1] = color.y;
+	v->color[2] = color.z;
+	v->color[3] = color.w;
 
 	v->attribute[0] = a0;
 	v->attribute[1] = a1;
@@ -65,7 +65,6 @@ void FontManager::render(float width, float height)
 	float scalex = 1.0;
 	float scaley = 1.0;
 
-
 	gl4::ShaderManager::getInstance()->bindShader("text");
 	gl4::TextureManager::getInstance()->bindTexture("fontmap", 0);
 	GLuint program = gl4::ShaderManager::getInstance()->getShaderProgram("text");
@@ -87,7 +86,7 @@ void FontManager::render(float width, float height)
 
 	// Lite oklart vilken blend som krävs
     //glBlendEquation(GL_FUNC_ADD, GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	buffer->render();
 
@@ -101,43 +100,61 @@ void FontManager::render(float width, float height)
 
 }
 
-void FontManager::addText(float x, float y, const char * text, float fontSize, const glm::vec3 &color)
+void FontManager::printText(float x, float y, const char *text, float fontSize, glm::vec4 color)
 {
-	float r = 1.0;
-	float g = 0.0;
-	float b = 0.0;
-	float a = 1.0;
+	addText(x,y,text,fontSize,color);
+	render();
+	clearText();
+}
 
+void FontManager::addText(float x, float y, const char * text, float fontSize, glm::vec4 color)
+{
 	float scale = fontSize / characterSize;
+
+	float xpos = x;
+	float ypos = y;
 
     for(size_t i=0; i<strlen(text); ++i )
     {
     	unsigned char index = (unsigned char)text[i];
     	Character * c = &charmap[index];
 
-        float x0  = x + c->x_offset * scale;
-        float y0  = y - c->y_offset * scale;
-        float x1  = x0 + c->width * scale;
-        float y1  = y0 - c->height * scale;
+    	if(text[i] == '\n')
+    	{
+    		ypos -= fontSize;
+    		xpos = x;
+    	}
+    	else
+    	{
+    		float x0  = xpos + c->x_offset * scale;
+	        float y0  = ypos - c->y_offset * scale;
+	        float x1  = x0 + c->width * scale;
+	        float y1  = y0 - c->height * scale;
 
-        float s0 = c->s0;
-        float t0 = c->t0;
-        float s1 = c->s1;
-        float t1 = c->t1;
+	        float s0 = c->s0;
+	        float t0 = c->t0;
+	        float s1 = c->s1;
+	        float t1 = c->t1;
 
-        int ind[6] = {0,1,2, 0,2,3};
-        Vertex vert[4];
+	        int ind[6] = {0,1,2, 0,2,3};
+	        Vertex vert[4];
 
-        setVertex(&vert[0], x0,y0,0.0,	0.0,0.0,1.0,	s0,t0,	r,g,b,a);
-        setVertex(&vert[1], x0,y1,0.0,	0.0,0.0,1.0,	s0,t1,	r,g,b,a);
-        setVertex(&vert[2], x1,y1,0.0,	0.0,0.0,1.0,	s1,t1,	r,g,b,a);
-        setVertex(&vert[3], x1,y0,0.0,	0.0,0.0,1.0,	s1,t0,	r,g,b,a);
+	        setVertex(&vert[0], x0,y0,0.0,	0.0,0.0,1.0,	s0,t0,	color);
+	        setVertex(&vert[1], x0,y1,0.0,	0.0,0.0,1.0,	s0,t1,	color);
+	        setVertex(&vert[2], x1,y1,0.0,	0.0,0.0,1.0,	s1,t1,	color);
+	        setVertex(&vert[3], x1,y0,0.0,	0.0,0.0,1.0,	s1,t0,	color);
 
-        printf("x0: %1.2f, y0: %1.2f, x1: %1.2f, y1: %1.2f \n",x0,y0,x1,y1);
+        //printf("x0: %1.2f, y0: %1.2f, x1: %1.2f, y1: %1.2f \n",x0,y0,x1,y1);
 
-        buffer->push_back(vert, 4, ind, 6 );
-        x += c->x_advance * scale;
+	        buffer->push_back(vert, 4, ind, 6 );
+	        xpos += c->x_advance * scale;
+    	}
     }
+}
+
+void FontManager::clearText()
+{
+	buffer->clear();
 }
 
 FontManager::FontManager()
@@ -151,11 +168,7 @@ FontManager::FontManager()
 	gl4::TextureManager::getInstance()->loadTexture("fontmap", fontimage);
 	loadFontData(fontfile, 512, 512);
 
-	buffer = new FontVBO();
-
-	addText(100.0,300.0,"Är du tuff eller?");
-
-	buffer->init();
+	buffer = new FontBuffer();
 }
 
 FontManager::~FontManager()
@@ -246,20 +259,20 @@ void FontManager::loadFontData(const char * filename, int width, int height)
     file.close();
 }
 
-FontManager::FontVBO::FontVBO()
+FontManager::FontBuffer::FontBuffer()
 {
-	_mode = GL_TRIANGLES;
-	vertices.reserve(256);
-	indices.reserve(256);
+	vertices.reserve(1024);
+	indices.reserve(1024);
+
+	init();
 }
 
-FontManager::FontVBO::~FontVBO()
+FontManager::FontBuffer::~FontBuffer()
 {
-	_varray = NULL;
-	_iarray = NULL;
+
 }
 
-void FontManager::FontVBO::push_back(Vertex * vData, int vCount, int * iData, int iCount)
+void FontManager::FontBuffer::push_back(Vertex * vData, int vCount, int * iData, int iCount)
 {
 	int offset = (int)vertices.size();
 
@@ -270,19 +283,70 @@ void FontManager::FontVBO::push_back(Vertex * vData, int vCount, int * iData, in
 		indices.push_back(offset+iData[i]);
 }
 
-void FontManager::FontVBO::init()
+void FontManager::FontBuffer::render()
 {
-	// Set pointers to temporary data into
-	_varray = vertices.data();
-	_iarray = indices.data();
+	glBindVertexArray(_vaoID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
 
-	_vsize = vertices.size();
-	_isize = indices.size();
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * vertices.size(), vertices.data());
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(int) * indices.size(), indices.data());
 
-	printf("_vsize = %i, _isize = %i \n", _vsize, _isize);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 
-	VBO::init();
+	glBindVertexArray(0);
+}
 
-	//vertices.clear();
-	//indices.clear();
+void FontManager::FontBuffer::clear()
+{
+	vertices.clear();
+	indices.clear();
+}
+
+void FontManager::FontBuffer::init()
+{
+	GLuint errorID = glGetError();
+	glGenVertexArrays(1, &_vaoID);
+
+	// First VAO setup
+	glBindVertexArray(_vaoID);
+
+	glGenBuffers(1, &_vBufferID);
+
+	glBindBuffer(GL_ARRAY_BUFFER, _vBufferID);
+	glBufferData(GL_ARRAY_BUFFER, 1024*sizeof(Vertex), 0, GL_DYNAMIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(12));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(20));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(32));
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(48));
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), BUFFER_OFFSET(60));
+	glEnableVertexAttribArray(5);
+
+	glGenBuffers(1, &_iBufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _iBufferID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 1024*sizeof(int), 0, GL_DYNAMIC_DRAW);
+
+	glBindVertexArray(0);
+
+	if(_vBufferID == 0)
+	{
+		std::cerr << "Vertex buffer not initialized" << std::endl;
+	}
+	if(_iBufferID == 0) 
+	{
+		std::cerr << "Index buffer not initialized" << std::endl;
+	}
+
+	errorID = glGetError();
+	if(errorID != GL_NO_ERROR)
+	{
+		std::cerr << "OpenGL error: " << glewGetErrorString(errorID) << std::endl;
+		std::cerr << "Attempting to proceed anyway. Expect rendering errors or a crash." << std::endl;
+	}
 }

@@ -2,7 +2,7 @@
 
 #include "Plot.h"
 
-class HeatMap
+class HeatMap : public Plot
 {
 
 };

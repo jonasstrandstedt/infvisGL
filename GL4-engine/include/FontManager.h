@@ -10,7 +10,10 @@ public:
 	static FontManager * getInstance();
 
 	void render(float width=1.0f, float height=1.0f);
-	void addText(float x, float y, const char * text, float fontSize=32.0f, const glm::vec3 &color=glm::vec3(1.0));
+	void addText(float x, float y, const char * text, float fontSize=32.0f, glm::vec4 color=glm::vec4(1.0));
+	void clearText();
+
+	void printText(float x, float y, const char * text, float fontSize=32.0f, glm::vec4 color=glm::vec4(1.0));
 private:
 	static FontManager * instance;
 
@@ -22,29 +25,36 @@ private:
 	    unsigned char index;
 	}Character;
 
-	class FontVBO;
+	class FontBuffer;
 
 	FontManager();
 	~FontManager();
 
 	void loadFontData(const char * filename, int width, int height);
 
-	FontVBO * buffer;
+	FontBuffer * buffer;
 	std::vector<Character> charmap;
 
 	int fontmapWidth, fontmapHeight;
 	float characterSize;
 };
 
-class FontManager::FontVBO : public gl4::VBO
+class FontManager::FontBuffer
 {
 public:
-	FontVBO();
-	~FontVBO();
+	FontBuffer();
+	~FontBuffer();
+
+	void init();
 
 	void push_back(Vertex * vData, int vCount, int * iData, int iCount);
-	virtual void init();
+	void render();
+	void clear();
 private:
 	std::vector<Vertex> vertices;
 	std::vector<int> indices;
+
+	GLuint _vaoID;
+	GLuint _vBufferID;
+	GLuint _iBufferID;
 };
