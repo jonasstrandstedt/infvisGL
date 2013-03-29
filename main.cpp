@@ -20,16 +20,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 DataCube * dc;
 DataLoader * dl;
 ColorMap * cm;
+ColorMap * tmcm;
 ColorMap::HSVPart * cmp1;
 ColorMap::LinearPart * cmp2;
 ColorMap::LinearPart * cmp3;
 
 gl4::Engine *engine;
 glm::vec2 angle;
-int year = 40;
+int year = 50;
 SplitContainer *sc;
 ScatterPlot *sp;
-ScatterPlot *sp2;
 TreemapPlot *tp;
 
 void keyboardCallback(int key, int state);
@@ -138,6 +138,12 @@ void myInitFunc(void)
 	//cm->addPart(cmp3);
 	cm->setDataCube(dc);
 	cm->setIndex(0);
+
+
+	tmcm = new ColorMap();
+	tmcm->addPart(cmp2);
+	tmcm->setDataCube(dc);
+	tmcm->setIndex(2);
 	
 	glm::vec2 rangex = dc->getAttribRange(0);
 	glm::vec2 rangey = dc->getAttribRange(1);
@@ -159,20 +165,11 @@ void myInitFunc(void)
 	sp->setAxisIndex(AXIS_X, 0);
 	sp->setAxisIndex(AXIS_Y, 3);
 
-	sp2 = new ScatterPlot();
-	sp2->setInput(dc);
-	sp2->setYear(year);
-	sp2->setColorMap(cm);
-	sp2->setSizeIndex(1);
-	sp2->setAxisIndex(AXIS_X, 0);
-	sp2->setAxisIndex(AXIS_Y, 3);
-	sp2->setBackgroundColor(glm::vec4(0,0,0,1));
-
-
 	tp = new TreemapPlot();
 	tp->setInput(dc);
+	tp->setYear(year);
 	tp->setSizeIndex(1);
-	tp->setGroupIndex(3);
+	tp->setGroupIndex(3, 4);
 	tp->setColorMap(cm);
 	
 	

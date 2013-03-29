@@ -28,16 +28,32 @@ public:
 		
 		sizeValue = 0;
 		colorValue = 0;
-		notRoot = false;
+		root = false;
+		container = true;
 	};
 	Node(float size, float color) {
+
+		//std::cout << "TreemapPlot::Creating node" << std::endl;
 		left = 0;
 		right = 0;
 	
 		sizeValue = size;
 		colorValue = color;
-		notRoot = true;
+		root = false;
+		container = false;
 	}
+
+	~Node()
+	{
+		if (left != 0)
+		{
+			delete left;
+		}
+		if (right != 0)
+		{
+			delete right;
+		}
+	};
 
 	void addNode(Node *n)
 	{
@@ -49,16 +65,36 @@ public:
 		} else {
 			if (left == 0)
 			{
+				//std::cout << "TreemapPlot::Left node free, adding" << std::endl;
 				left = n;
 			} else if (right == 0) {
+				//std::cout << "TreemapPlot::Right node free, adding" << std::endl;
 				right = n;
 			} else {
 				
 				if (n->sizeValue + left->sizeValue < right->sizeValue)
 				{
-					left->addNode(n);
+					if (left->container)
+					{
+						Node *temp = left;
+						left = new Node();
+						left->root = true;
+						left->addNode(temp);
+						left->addNode(n);
+					} else {
+						left->addNode(n);
+					}
 				} else {
-					right->addNode(n);
+					if (right->container)
+					{
+						Node *temp = right;
+						right = new Node();
+						right->root = true;
+						right->addNode(temp);
+						right->addNode(n);
+					} else {
+						right->addNode(n);
+					}
 				}
 				
 			}
@@ -67,8 +103,12 @@ public:
 	};
 
 	bool isLeaf() {
-		return left == 0 && right == 0 && notRoot;
+		return left == 0 && right == 0 && !root && !container;
 	};
+
+	bool isContatiner() {
+		return !root && container;
+	}
 
 
 
@@ -79,7 +119,8 @@ public:
 	float groupValue;
 	float colorValue;
 
-	bool notRoot;
+	bool root;
+	bool container;
 };
 
 

@@ -55,7 +55,7 @@ void ScatterPlot::setAxisIndex(int axis, int index)
 
 void ScatterPlot::renderPlot()
 {
-	std::cout << "ScatterPlot::render()" << std::endl;
+	std::cout << "ScatterPlot::renderPlot()" << std::endl;
 
 	// settings
 	const int * datacount = dc->getDataCount();

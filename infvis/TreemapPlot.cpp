@@ -39,7 +39,7 @@ TreemapPlot::~TreemapPlot()
 void TreemapPlot::setGroupIndex(int index, int g)
 {
 	groupIndex = index;
-	groups = 7;
+	groups = g;
 	invalidate();
 }
 
@@ -72,6 +72,7 @@ bool compareTreemapData(const TreemapData &a, const TreemapData &b)
 
 void TreemapPlot::renderPlot()
 {
+	std::cout << "TreemapPlot::renderPlot()" << std::endl;
 	// settings
 	const int * datacount = dc->getDataCount();
 	const float padding_x_left = 10.0;
@@ -86,8 +87,20 @@ void TreemapPlot::renderPlot()
 	const float plot_height = container_height - padding_y_bottom - padding_y_top;
 
 	const glm::vec2 scale = glm::vec2(1.0f/container_width, 1.0f / container_height);
+	const glm::vec2 groupScale = dc->getAttribRange(groupIndex);
 
+	
 	Node *root = new Node();
+	root->root = true;
+
+	//groups = 3;
+	Node *groupNodes[groups];
+	for (int i = 0; i < groups; ++i)
+	{
+		groupNodes[i] = new Node();
+	}
+	
+	std::cout << "TreemapPlot::init complete" << std::endl;
 	for (int i = 0; i < datacount[0]; ++i)
 	{
 		if (dc->isSetAll(i, year))
@@ -99,19 +112,24 @@ void TreemapPlot::renderPlot()
 			d.sizeValue = dc->getItem(i, year, sizeIndex);
 			d.groupValue = dc->getItem(i, year, groupIndex);
 			d.colorValue = 0.0f;
+
+			int group = (int)((d.groupValue - groupScale[0]) / (groupScale[1] - groupScale[0]) * (float) groups); 
 			if (colormap != 0)
 			{
 				d.colorValue = dc->getItem(i, year, colormap->getIndex());
 			}
-
-
-
+			//std::cout << "TreemapPlot::group = " <<  group <<  std::endl;
 
 			Node *n = new Node(d.sizeValue, d.colorValue);
-			root->addNode(n);
+			groupNodes[group]->addNode(n);
 		}
 	}
-
+	
+	std::cout << "TreemapPlot::adding groupnodes to root" << std::endl;
+	for (int i = 0; i < groups; ++i)
+	{
+		root->addNode(groupNodes[i]);
+	}
 
 
 	gl4::ShaderManager::getInstance()->bindShader("uniform_color");
@@ -123,7 +141,13 @@ void TreemapPlot::renderPlot()
 
 	const float wscale = plot_width / container_width;
 
+	std::cout << "TreemapPlot::rendering" << std::endl;
 	renderNode(root, glm::vec2(padding_x_left*scale[0], plot_width*scale[0]), glm::vec2(padding_y_bottom*scale[1], plot_height*scale[1]),colorLoc);
+
+	std::cout << "TreemapPlot::deleting" << std::endl;
+	delete root;
+	std::cout << "TreemapPlot::done" << std::endl;
+
 
 }
 
