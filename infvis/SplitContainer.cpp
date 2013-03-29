@@ -57,12 +57,3 @@ void SplitContainer::render()
 
 
 }
-
-
-/*
-glViewport(	GLint  	x,
- 	GLint  	y,
- 	GLsizei  	width,
- 	GLsizei  	height);
-
- 	*/

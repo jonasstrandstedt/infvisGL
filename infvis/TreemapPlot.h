@@ -106,7 +106,7 @@ public:
 		return left == 0 && right == 0 && !root && !container;
 	};
 
-	bool isContatiner() {
+	bool isContainer() {
 		return !root && container;
 	}
 
@@ -147,5 +147,5 @@ private:
 	int year;
 
 
-	void renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int colorLoc);
+	void renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int colorLoc, const glm::vec2 &scale);
 };

@@ -93,39 +93,37 @@ void TreemapPlot::renderPlot()
 	Node *root = new Node();
 	root->root = true;
 
-	//groups = 3;
 	Node *groupNodes[groups];
 	for (int i = 0; i < groups; ++i)
 	{
 		groupNodes[i] = new Node();
 	}
 	
-	std::cout << "TreemapPlot::init complete" << std::endl;
 	for (int i = 0; i < datacount[0]; ++i)
 	{
 		if (dc->isSetAll(i, year))
 		{
 
-			TreemapData d;
+			float sizeValue = dc->getItem(i, year, sizeIndex);
+			float groupValue = dc->getItem(i, year, groupIndex);
+			float colorValue = 0.0f;
 
-			d.DataCubeEntry = i;
-			d.sizeValue = dc->getItem(i, year, sizeIndex);
-			d.groupValue = dc->getItem(i, year, groupIndex);
-			d.colorValue = 0.0f;
-
-			int group = (int)((d.groupValue - groupScale[0]) / (groupScale[1] - groupScale[0]) * (float) groups); 
+			int group = (int)((groupValue - groupScale[0]) / (groupScale[1] - groupScale[0]) * (float) groups); 
+			if (group >= groups)
+			{
+				group--;
+			}
 			if (colormap != 0)
 			{
-				d.colorValue = dc->getItem(i, year, colormap->getIndex());
+				colorValue = dc->getItem(i, year, colormap->getIndex());
 			}
 			//std::cout << "TreemapPlot::group = " <<  group <<  std::endl;
 
-			Node *n = new Node(d.sizeValue, d.colorValue);
+			Node *n = new Node(sizeValue, colorValue);
 			groupNodes[group]->addNode(n);
 		}
 	}
 	
-	std::cout << "TreemapPlot::adding groupnodes to root" << std::endl;
 	for (int i = 0; i < groups; ++i)
 	{
 		root->addNode(groupNodes[i]);
@@ -135,23 +133,14 @@ void TreemapPlot::renderPlot()
 	gl4::ShaderManager::getInstance()->bindShader("uniform_color");
 	GLuint program = gl4::ShaderManager::getInstance()->getShaderProgram("uniform_color");
 	int colorLoc = glGetUniformLocation(program, "uniform_color");
+	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_PROJECTION), 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
 
-	float startpos = 0.0f;
-	glm::vec3 color = glm::vec3(1,0,0);
+	renderNode(root, glm::vec2(padding_x_left*scale[0], plot_width*scale[0]), glm::vec2(padding_y_bottom*scale[1], plot_height*scale[1]),colorLoc, scale);
 
-	const float wscale = plot_width / container_width;
-
-	std::cout << "TreemapPlot::rendering" << std::endl;
-	renderNode(root, glm::vec2(padding_x_left*scale[0], plot_width*scale[0]), glm::vec2(padding_y_bottom*scale[1], plot_height*scale[1]),colorLoc);
-
-	std::cout << "TreemapPlot::deleting" << std::endl;
 	delete root;
-	std::cout << "TreemapPlot::done" << std::endl;
-
-
 }
 
-void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int colorLoc)
+void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int colorLoc, const glm::vec2 &scale)
 {
 	if (n->isLeaf())
 	{
@@ -167,31 +156,73 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 
 
 		glUniform3fv(colorLoc, 1, glm::value_ptr(color));
-
-		// orthogonal projection
-		glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_PROJECTION), 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
 		glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 		primitive->render();
 	} else {
+		if(n->isContainer()) {
+
+
+			glm::vec3 color = glm::vec3(0,0,0);
+			glm::mat4 transform = glm::mat4();
+			const float border_width = 4.0f;
+
+			//bottom
+			transform = glm::mat4();
+			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0],0));
+			transform = glm::scale(transform, glm::vec3(size_x[1],scale[1]*border_width, 0.0));
+			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
+
+			primitive->render();
+
+			//top
+			transform = glm::mat4();
+			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0]+size_y[1],0));
+			transform = glm::scale(transform, glm::vec3(size_x[1],scale[1]*border_width, 0.0));
+			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
+
+			primitive->render();
+
+			//left
+			transform = glm::mat4();
+			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0],0));
+			transform = glm::scale(transform, glm::vec3(scale[0]*border_width,size_y[1], 0.0));
+			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
+
+			primitive->render();
+
+			//right
+			transform = glm::mat4();
+			transform = glm::translate(transform, glm::vec3(size_x[0]+size_x[1], size_y[0],0));
+			transform = glm::scale(transform, glm::vec3(scale[0]*border_width,size_y[1], 0.0));
+			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
+
+			primitive->render();
+
+
+		}
 		if (n->left != 0 && n->right != 0)
 		{
 			float scaleleft = n->left->sizeValue / (n->left->sizeValue + n->right->sizeValue);
 			float scaleright = 1.0f - scaleleft;
 			if (size_x[1]  > size_y[1] )
 			{
-				renderNode(n->left, glm::vec2(size_x[0], size_x[1]*scaleleft),size_y, colorLoc);
-				renderNode(n->right, glm::vec2(size_x[0] + size_x[1]*scaleleft, size_x[1]*scaleright),size_y, colorLoc);
+				renderNode(n->left, glm::vec2(size_x[0], size_x[1]*scaleleft),size_y, colorLoc,scale);
+				renderNode(n->right, glm::vec2(size_x[0] + size_x[1]*scaleleft, size_x[1]*scaleright),size_y, colorLoc,scale);
 			} else {
-				renderNode(n->left, size_x,glm::vec2(size_y[0], size_y[1]*scaleleft), colorLoc);
-				renderNode(n->right, size_x,glm::vec2(size_y[0]+size_y[1]*scaleleft, size_y[1]*scaleright), colorLoc);
+				renderNode(n->left, size_x,glm::vec2(size_y[0], size_y[1]*scaleleft), colorLoc,scale);
+				renderNode(n->right, size_x,glm::vec2(size_y[0]+size_y[1]*scaleleft, size_y[1]*scaleright), colorLoc,scale);
 			}
 		} else {
 			if (n->left != 0)
 			{
-				renderNode(n->left, size_x,size_y, colorLoc);
+				renderNode(n->left, size_x,size_y, colorLoc,scale);
 			} else if (n->right != 0){
-				renderNode(n->right, size_x,size_y, colorLoc);
+				renderNode(n->right, size_x,size_y, colorLoc,scale);
 			}
 		}
 	}

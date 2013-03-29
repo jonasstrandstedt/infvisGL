@@ -169,7 +169,7 @@ void myInitFunc(void)
 	tp->setInput(dc);
 	tp->setYear(year);
 	tp->setSizeIndex(1);
-	tp->setGroupIndex(3, 4);
+	tp->setGroupIndex(3, 3);
 	tp->setColorMap(cm);
 	
 	
@@ -180,7 +180,7 @@ void myInitFunc(void)
 void myRenderFunc(void) 
 {
 	sc->render();
-
+/*
 	FontManager * fmgr = FontManager::getInstance();
 
 	fmgr->printText(50,60,"Bra skit lr?",16.0);
@@ -192,6 +192,7 @@ void myRenderFunc(void)
 
 	fmgr->printText(100,500,text,32.0, glm::vec4(0.0,0.0,0.0,1.0));
 	fmgr->printText(100,400,text,16.0, glm::vec4(0.0,0.0,0.0,1.0));
+	*/
 }
 
 void myUpdateFunc(float dt)
