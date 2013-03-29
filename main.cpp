@@ -8,8 +8,10 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include "Engine.h"
+
 #include "infvis/SplitContainer.h"
 #include "infvis/ScatterPlot.h"
+#include "infvis/TreemapPlot.h"
 
 #include "infvis/DataCube.h"
 #include "infvis/DataLoader.h"
@@ -27,6 +29,8 @@ glm::vec2 angle;
 int year = 40;
 SplitContainer *sc;
 ScatterPlot *sp;
+ScatterPlot *sp2;
+TreemapPlot *tp;
 
 void keyboardCallback(int key, int state);
 void myRenderFunc(void);
@@ -78,6 +82,7 @@ void keyboardCallback(int key, int state)
 			year++;
 
 		sp->setYear(year);
+		tp->setYear(year);
 		std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 	}
 	if(key == GLFW_KEY_LEFT && state == GLFW_PRESS) {
@@ -85,10 +90,9 @@ void keyboardCallback(int key, int state)
 			year--;
 
 		sp->setYear(year);
+		tp->setYear(year);
 		std::cout << "Rendering year " << year << "/" << datacount[1] << std::endl;
 	}
-
-
 }
 
 
@@ -110,6 +114,9 @@ void myInitFunc(void)
 	gl4::Shader *s3 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_uniform_color.glsl");
 	gl4::ShaderManager::getInstance()->addShaderProgram("uniform_color", s3);
 
+	gl4::Shader *s4 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_text.glsl");
+	gl4::ShaderManager::getInstance()->addShaderProgram("text", s4);
+
 	dl = new DataLoader();
 	dl->addAttribFromFile("fertility", "data/fertility_rate.csv");
 	dl->addAttribFromFile("population", "data/total_population.csv");
@@ -130,7 +137,7 @@ void myInitFunc(void)
 	//cm->addPart(cmp2);
 	//cm->addPart(cmp3);
 	cm->setDataCube(dc);
-	cm->setIndex(2);
+	cm->setIndex(0);
 	
 	glm::vec2 rangex = dc->getAttribRange(0);
 	glm::vec2 rangey = dc->getAttribRange(1);
@@ -143,8 +150,8 @@ void myInitFunc(void)
 	std::cout << "dc->GetAttribRange(3) = " << rangew[0] << " -> " << rangew[1] << std::endl;
 
 	sc = new SplitContainer(glm::vec2(0,WINDOW_WIDTH),glm::vec2(0, WINDOW_HEIGHT));
-	sp = new ScatterPlot();
 	
+	sp = new ScatterPlot();
 	sp->setInput(dc);
 	sp->setYear(year);
 	sp->setColorMap(cm);
@@ -152,14 +159,42 @@ void myInitFunc(void)
 	sp->setAxisIndex(AXIS_X, 0);
 	sp->setAxisIndex(AXIS_Y, 3);
 
-	sc->setBottomChild(sp);
+	sp2 = new ScatterPlot();
+	sp2->setInput(dc);
+	sp2->setYear(year);
+	sp2->setColorMap(cm);
+	sp2->setSizeIndex(1);
+	sp2->setAxisIndex(AXIS_X, 0);
+	sp2->setAxisIndex(AXIS_Y, 3);
+	sp2->setBackgroundColor(glm::vec4(0,0,0,1));
+
+
+	tp = new TreemapPlot();
+	tp->setInput(dc);
+	tp->setSizeIndex(1);
+	tp->setGroupIndex(3);
+	tp->setColorMap(cm);
 	
-	sp->invalidate();
+	
+	sc->setTopChild(sp);
+	sc->setBottomChild(tp);
 }
 
 void myRenderFunc(void) 
 {
 	sc->render();
+
+	FontManager * fmgr = FontManager::getInstance();
+
+	fmgr->printText(50,60,"Bra skit lr?",16.0);
+	fmgr->printText(50,48,"Skit snack!",16.0);
+
+	fmgr->printText(250,250,"RED AND BIG", 128.0, glm::vec4(1.0,0.0,0.0,1.0));
+
+	static const char * text = "This is the tale of a little \nbastard who lived somewhere";
+
+	fmgr->printText(100,500,text,32.0, glm::vec4(0.0,0.0,0.0,1.0));
+	fmgr->printText(100,400,text,16.0, glm::vec4(0.0,0.0,0.0,1.0));
 }
 
 void myUpdateFunc(float dt)

@@ -28,4 +28,5 @@ private:
 	int sizeIndex;
 	int year;
 	gl4::Circle *primitive;
+	gl4::VBO *obj;
 };

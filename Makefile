@@ -30,12 +30,16 @@ OBJECTS += GL4-engine/src/TextureManager.o
 OBJECTS += GL4-engine/src/Sphere.o
 OBJECTS += GL4-engine/src/Circle.o
 OBJECTS += GL4-engine/src/Geometry.o
+
+OBJECTS += GL4-engine/src/FontManager.o
+
 OBJECTS += infvis/DataLoader.o
 OBJECTS += infvis/DataCube.o
 OBJECTS += infvis/Container.o
 OBJECTS += infvis/SplitContainer.o
 OBJECTS += infvis/Plot.o
 OBJECTS += infvis/ScatterPlot.o
+OBJECTS += infvis/TreemapPlot.o
 OBJECTS += infvis/ColorMap.o
 
 # Name the output file, if changed then the sgct_sim.sh script needs to be edited as well
@@ -60,7 +64,7 @@ OPENGL=1
 ifdef OPENGL
 	MESSAGE += OpenGL,
 	ifeq ($(OS),Linux)
-		FLAGS += -lglfw -lGL -lGLU -lGLEW
+		FLAGS += -lglfw -lGLU -lGLEW
 	else ifeq ($(OS),Darwin)
 		INCPATH += -isystem"/usr/X11/include"
 		FLAGS += -framework Cocoa -framework OpenGL -lglfw -lGLEW -L"/usr/X11/lib/"
