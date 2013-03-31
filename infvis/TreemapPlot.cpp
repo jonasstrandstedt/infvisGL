@@ -1,5 +1,6 @@
 #include "TreemapPlot.h"
 #include <algorithm>
+#include <sstream>
 
 TreemapPlot::TreemapPlot() : Plot()
 {
@@ -78,7 +79,7 @@ void TreemapPlot::renderPlot()
 	const float padding_x_left = 10.0;
 	const float padding_y_bottom = 10.0;
 	const float padding_x_right = 10.0;
-	const float padding_y_top = 10.0;
+	const float padding_y_top = 40.0;
 
 	// start stage 2
 	const float container_width = x[1] - x[0]; 
@@ -88,6 +89,7 @@ void TreemapPlot::renderPlot()
 
 	const glm::vec2 scale = glm::vec2(1.0f/container_width, 1.0f / container_height);
 	const glm::vec2 groupScale = dc->getAttribRange(groupIndex);
+	const float group_diff = (groupScale[1] - groupScale[0]) / (float)groups;
 
 	
 	Node *root = new Node();
@@ -97,6 +99,16 @@ void TreemapPlot::renderPlot()
 	for (int i = 0; i < groups; ++i)
 	{
 		groupNodes[i] = new Node();
+
+		std::ostringstream buff;
+		buff<<groupScale[0]+group_diff*i;
+		std::string tag = "";
+		tag += buff.str();
+		buff.str("");
+		tag += " -> ";
+		buff<<groupScale[0]+group_diff*(i+1);
+		tag += buff.str();
+		groupNodes[i]->tag = tag;
 	}
 	
 	for (int i = 0; i < datacount[0]; ++i)
@@ -135,7 +147,12 @@ void TreemapPlot::renderPlot()
 	int colorLoc = glGetUniformLocation(program, "uniform_color");
 	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_PROJECTION), 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
 
+	FontManager * fmgr = FontManager::getInstance();
+
 	renderNode(root, glm::vec2(padding_x_left*scale[0], plot_width*scale[0]), glm::vec2(padding_y_bottom*scale[1], plot_height*scale[1]),colorLoc, scale);
+
+	fmgr->render();
+	fmgr->clearText();
 
 	delete root;
 }
@@ -144,10 +161,10 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 {
 	if (n->isLeaf())
 	{
-		glm::vec3 color = glm::vec3(0,0,0);
+		glm::vec4 color = glm::vec4(0,0,0,1.0f);
 		if (colormap != 0)
 		{
-			color = colormap->map(n->colorValue);
+			color = glm::vec4(colormap->map(n->colorValue),1.0f);
 		}
 
 		glm::mat4 transform = glm::mat4();
@@ -155,7 +172,7 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 		transform = glm::scale(transform, glm::vec3(size_x[1],size_y[1], 0.0));
 
 
-		glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+		glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 		glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 		primitive->render();
@@ -165,7 +182,7 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 		if(n->isContainer()) {
 
 
-			glm::vec3 color = glm::vec3(0,0,0);
+			glm::vec4 color = glm::vec4(0,0,0,1.0f);
 			glm::mat4 transform = glm::mat4();
 			const float border_width = 4.0f;
 
@@ -173,7 +190,7 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 			transform = glm::mat4();
 			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0],0));
 			transform = glm::scale(transform, glm::vec3(size_x[1],scale[1]*border_width, 0.0));
-			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+			glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 			primitive->render();
@@ -182,7 +199,7 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 			transform = glm::mat4();
 			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0]+size_y[1],0));
 			transform = glm::scale(transform, glm::vec3(size_x[1],scale[1]*border_width, 0.0));
-			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+			glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 			primitive->render();
@@ -191,7 +208,7 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 			transform = glm::mat4();
 			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0],0));
 			transform = glm::scale(transform, glm::vec3(scale[0]*border_width,size_y[1], 0.0));
-			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+			glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 			primitive->render();
@@ -200,11 +217,19 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 			transform = glm::mat4();
 			transform = glm::translate(transform, glm::vec3(size_x[0]+size_x[1], size_y[0],0));
 			transform = glm::scale(transform, glm::vec3(scale[0]*border_width,size_y[1], 0.0));
-			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+			glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 			primitive->render();
 
+			FontManager * fmgr = FontManager::getInstance();
+
+			fmgr->addText(	x[0]+1.0f/scale[0]*size_x[0] + 5.0f,
+							y[0]+1.0f/scale[1]*size_y[0] + 20.0f,
+							n->tag.c_str(),
+							16,
+							glm::vec4(1.0,1.0,1.0,1.0)
+						);
 
 		}
 		if (n->left != 0 && n->right != 0)

@@ -12,7 +12,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 uniform mat4 Projection;
 uniform mat4 ModelTransform;
 uniform sampler2D texture1;
-uniform vec4 uniform_color;
 
 in vec2 st;
 in vec3 stp;
@@ -24,5 +23,5 @@ out vec4 diffuse;
 
 void main()
 {
-	diffuse = uniform_color;
+	diffuse = vec4(0.0, 0.0, 0.0, 1.0);
 }

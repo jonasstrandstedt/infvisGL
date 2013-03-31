@@ -50,7 +50,7 @@ DataCube * DataLoader::getDataCube()
 				stoppos = line.find_first_of(";", startpos+1);
 				++cols;
 			}
-			t = cols - 2;
+			t = cols - 3;
 			file->close();
 			delete file;
 
@@ -65,22 +65,24 @@ DataCube * DataLoader::getDataCube()
 					std::cerr << "ERROR: Could not open file: " << filenames.at(i) << std::endl;
 					exit(0);
 				}
+
+				d->setAttribName(i, attribNames.at(i));
 				//std::getline(*file, line);
 				int item = 0;
 				while(std::getline(*file, line)) {
 
-					if (item > 0)
-					{
-	 									//std::cout << "==================="<< std::endl;
-						startpos = 0;
-						stoppos = line.find_first_of(";");
-						int column = 0;
-						while(startpos != std::string::npos) {
-							std::string val = line.substr(startpos+1, stoppos-startpos-1);
+					
+	 				//std::cout << "==================="<< std::endl;
+					startpos = 0;
+					stoppos = line.find_first_of(";");
+					int column = 0;
+					while(startpos != std::string::npos) {
+						std::string val = line.substr(startpos+1, stoppos-startpos-1);
 
-							if (column > 1)
+						if (column > 1)
+						{
+							if (item > 0)
 							{
-								
 	 							//std::cout << "val (string) = " << val << std::endl;
 								if (val.length() > 0)
 								{
@@ -92,15 +94,19 @@ DataCube * DataLoader::getDataCube()
 	 								 							//std::cout << "val (float)  = " << fval << std::endl;
 									d->setItem(item-1, column -2, i, fval);
 								}
-								
+							}else if(i == 0){
+								d->setTimeName(column-2, val);
 							}
-
-
-							startpos = line.find_first_of(";", stoppos);
-							stoppos = line.find_first_of(";", startpos+1);
-							++column;
+						} else if(column == 0 && item > 0) {
+							d->setEntryName(item-1, val);
 						}
+
+
+						startpos = line.find_first_of(";", stoppos);
+						stoppos = line.find_first_of(";", startpos+1);
+						++column;
 					}
+					
 					
 					++item;
 
@@ -108,8 +114,6 @@ DataCube * DataLoader::getDataCube()
 				file->close();
 				delete file;
 			}
-			
-			
 			return d;
 		}
 

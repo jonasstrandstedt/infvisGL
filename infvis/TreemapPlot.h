@@ -121,6 +121,7 @@ public:
 
 	bool root;
 	bool container;
+	std::string tag;
 };
 
 

@@ -20,6 +20,10 @@ data(NULL)
 		data[i] = 0.0f;
 		dataExist[i] = false;
 	}
+
+	attribName = new std::vector<std::string>(attributes);
+	entryName = new std::vector<std::string>(entries);
+	timeName = new std::vector<std::string>(timeStamps);
 }
 
 DataCube::~DataCube()
@@ -28,6 +32,12 @@ DataCube::~DataCube()
 		delete[] data;
 	if(dataExist)
 		delete[] dataExist;
+	if (attribName)
+		delete attribName;
+	if (entryName)
+		delete entryName;
+	if (timeName)
+		delete timeName;
 }
 
 const int * DataCube::getDataCount()
@@ -51,12 +61,17 @@ float DataCube::getItem(int index, int time, int attrib)
 
 const std::string & DataCube::getAttribName(int attrib)
 {
-	return attribName[attrib];
+	return attribName->at(attrib);
 }
 
 const std::string & DataCube::getEntryName(int index)
 {
-	return entryName[index];
+	return entryName->at(index);
+}
+
+const std::string & DataCube::getTimeName(int index)
+{
+	return timeName->at(index);
 }
 
 const glm::vec2 & DataCube::getAttribRange(int attrib)
@@ -98,14 +113,19 @@ bool DataCube::isSetAll(int index, int time)
 	return true;
 }
 
-void DataCube::setAtrribName(int attrib, const std::string &name)
+void DataCube::setAttribName(int attrib, const std::string name)
 {
-	attribName[attrib] = name;
+	attribName->at(attrib) = name;
 }
 
-void DataCube::setEntryName(int index, const std::string &name)
+void DataCube::setEntryName(int index, const std::string name)
 {
-	entryName[index] = name;
+	entryName->at(index) = name;
+}
+
+void DataCube::setTimeName(int index, const std::string name)
+{
+	timeName->at(index) = name;
 }
 
 void DataCube::calculateAttribRanges()

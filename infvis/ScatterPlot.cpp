@@ -77,8 +77,8 @@ void ScatterPlot::renderPlot()
 	GLuint program = gl4::ShaderManager::getInstance()->getShaderProgram("uniform_color");
 	int colorLoc = glGetUniformLocation(program, "uniform_color");
 
-	glm::vec3 color = glm::vec3(1.0,1.0,1.0);
-	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+	glm::vec4 color = glm::vec4(1.0,1.0,1.0,1.0);
+	glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 
 	glm::vec2 rangex = dc->getAttribRange(x_index);
 	glm::vec2 rangey = dc->getAttribRange(y_index);
@@ -101,14 +101,14 @@ void ScatterPlot::renderPlot()
 			if (colormap != 0)
 			{
 				float colorval = dc->getItem(i, year, colormap->getIndex());
-				color = colormap->map(colorval);
+				color = glm::vec4(colormap->map(colorval),1.0f);
 			}
 			/*
 			std::cout << "xy = (" << x << ", " << y << ")" << std::endl;
 			std::cout << "pos = (" << posx << ", " << posy << ")" << std::endl;
 			*/
 
-			glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+			glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 
 			glm::mat4 transform = glm::mat4();
 			transform = glm::translate(transform, position);
@@ -125,37 +125,95 @@ void ScatterPlot::renderPlot()
 
 	}
 
+	int numXminor = 8;
+	int numYminor = 24;
 
-	glm::mat4 transform = glm::mat4();
-	transform = glm::translate(transform, glm::vec3(padding_x_left*scale[0], padding_y_bottom*scale[1],0));
-	transform = glm::scale(transform, glm::vec3(scatterplot_width,1, 0.0));
+	float stepXpos = (container_width / (float)numXminor) / container_width;
+	float stepXvalue = (rangex[1] - rangex[0]) / (float)numXminor;
+
+	float stepYpos = (container_height / (float)numYminor) / container_height;
+	float stepYvalue = (rangey[1] - rangey[0]) / (float)numYminor;
+
+	// Draw AXIS
+
+	glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	color = glm::vec4(0.0,0.0,0.0,1.0);
+	glUniform4fv(colorLoc, 1, glm::value_ptr(color));
+
+	glm::mat4 transform;;
+
+	// X-AXIS MAJOR
+
+	transform = glm::translate(glm::mat4(), glm::vec3(0, padding_y_bottom*scale[1],0));
+	transform = glm::scale(transform, glm::vec3(container_width,1, 0.0));
 	transform = glm::scale(transform, glm::vec3(scale, 0.0));
 
-	gl4::ShaderManager::getInstance()->bindShader("color");
-
-	// orthogonal projection
-	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_PROJECTION), 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
 	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 	obj->render();
 
-	transform = glm::mat4();
-	transform = glm::translate(transform, glm::vec3(padding_x_left*scale[0], padding_y_bottom*scale[1],0));
-	transform = glm::scale(transform, glm::vec3(1,scatterplot_height, 0.0));
+	// Y-AXIS MAJOR
+
+	transform = glm::translate(glm::mat4(), glm::vec3(padding_x_left*scale[0], 0,0));
+	transform = glm::scale(transform, glm::vec3(1,container_height, 0.0));
 	transform = glm::scale(transform, glm::vec3(scale, 0.0));
 
-	gl4::ShaderManager::getInstance()->bindShader("color");
-
-		// orthogonal projection
-	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_PROJECTION), 1, GL_FALSE, &_orthogonalProjectionMatrix[0][0]);
 	glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 	obj->render();
 
+	color = glm::vec4(0.0,0.0,0.0,0.8);
+	glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 
+	// X-AXIS MINORS
+	for(int i=-numXminor+1; i<numXminor; ++i)
+	{
+		float ycoord = padding_y_bottom*scale[1] + stepXpos*i;
+
+		if(ycoord < 0.0)
+			continue;
+
+		if(ycoord > 1.0)
+			break;
+
+		transform = glm::translate(glm::mat4(), glm::vec3(0, padding_y_bottom*scale[1] + stepXpos*i,0));
+		transform = glm::scale(transform, glm::vec3(container_width,0.2, 0.0));
+		transform = glm::scale(transform, glm::vec3(scale, 0.0));
+
+		glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
+
+		obj->render();
+	}
+
+	// Y-AXIS MINORS
+	for(int i=-numYminor+1; i<numYminor; ++i)
+	{
+		float xcoord = padding_x_left*scale[0] + stepYpos*i;
+
+		if(xcoord < 0.0)
+			continue;
+
+		if(xcoord > 1.0)
+			break;
+
+		transform = glm::translate(glm::mat4(), glm::vec3(padding_x_left*scale[0] + stepYpos*i, 0,0));
+		transform = glm::scale(transform, glm::vec3(0.2,container_height, 0.0));
+		transform = glm::scale(transform, glm::vec3(scale, 0.0));
+
+		glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
+
+		obj->render();
+	}
+
+
+	glDisable(GL_BLEND);
+
+	// TEXT
 
 	FontManager * fmgr = FontManager::getInstance();
 
 	fmgr->printText(5,y[1]-y[0]-20,"Bra skit lr?",16.0, glm::vec4(1.0,0.0,0.0,1.0));
-
+	fmgr->printText(100,100,"Bra skit lr?",16.0,glm::vec4(0.0,0.0,0.0,1.0));
 }

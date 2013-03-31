@@ -117,6 +117,9 @@ void myInitFunc(void)
 	gl4::Shader *s4 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_text.glsl");
 	gl4::ShaderManager::getInstance()->addShaderProgram("text", s4);
 
+	gl4::Shader *s5 = new gl4::Shader( "data/shaders/vs.glsl","data/shaders/fs_black.glsl");
+	gl4::ShaderManager::getInstance()->addShaderProgram("black", s5);
+
 	dl = new DataLoader();
 	dl->addAttribFromFile("fertility", "data/fertility_rate.csv");
 	dl->addAttribFromFile("population", "data/total_population.csv");
@@ -169,7 +172,7 @@ void myInitFunc(void)
 	tp->setInput(dc);
 	tp->setYear(year);
 	tp->setSizeIndex(1);
-	tp->setGroupIndex(3, 7);
+	tp->setGroupIndex(0, 7);
 	tp->setColorMap(tmcm);
 	
 	
@@ -181,20 +184,11 @@ void myRenderFunc(void)
 {
 	sc->render();
 
-	/*
+	
 	FontManager * fmgr = FontManager::getInstance();
 
-	fmgr->printText(50,60,"Bra skit lr?",16.0, glm::vec4(1.0,0.0,0.0,1.0));
-
-	fmgr->printText(50,48,"Skit snack!",16.0);
-
-	fmgr->printText(250,250,"RED AND BIG", 128.0, glm::vec4(1.0,0.0,0.0,1.0));
-
-	static const char * text = "This is the tale of a little \nbastard who lived somewhere";
-
-	fmgr->printText(100,500,text,32.0, glm::vec4(0.0,0.0,0.0,1.0));
-	fmgr->printText(100,400,text,16.0, glm::vec4(0.0,0.0,0.0,1.0));
-	*/
+	fmgr->printText(WINDOW_WIDTH / 2.0 - 30,WINDOW_HEIGHT / 2.0,dc->getTimeName(year).c_str(),20.0, glm::vec4(0.0,0.0,0.0,1.0));
+	
 }
 
 void myUpdateFunc(float dt)
