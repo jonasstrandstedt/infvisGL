@@ -160,6 +160,8 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 
 		primitive->render();
 	} else {
+
+		// of container, add borders
 		if(n->isContainer()) {
 
 

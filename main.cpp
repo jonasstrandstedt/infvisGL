@@ -141,7 +141,7 @@ void myInitFunc(void)
 
 
 	tmcm = new ColorMap();
-	tmcm->addPart(cmp2);
+	tmcm->addPart(cmp1);
 	tmcm->setDataCube(dc);
 	tmcm->setIndex(2);
 	
@@ -169,8 +169,8 @@ void myInitFunc(void)
 	tp->setInput(dc);
 	tp->setYear(year);
 	tp->setSizeIndex(1);
-	tp->setGroupIndex(3, 3);
-	tp->setColorMap(cm);
+	tp->setGroupIndex(3, 7);
+	tp->setColorMap(tmcm);
 	
 	
 	sc->setTopChild(sp);
@@ -180,10 +180,12 @@ void myInitFunc(void)
 void myRenderFunc(void) 
 {
 	sc->render();
-/*
+
+	/*
 	FontManager * fmgr = FontManager::getInstance();
 
-	fmgr->printText(50,60,"Bra skit lr?",16.0);
+	fmgr->printText(50,60,"Bra skit lr?",16.0, glm::vec4(1.0,0.0,0.0,1.0));
+
 	fmgr->printText(50,48,"Skit snack!",16.0);
 
 	fmgr->printText(250,250,"RED AND BIG", 128.0, glm::vec4(1.0,0.0,0.0,1.0));

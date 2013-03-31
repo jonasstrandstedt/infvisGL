@@ -153,4 +153,9 @@ void ScatterPlot::renderPlot()
 	obj->render();
 
 
+
+	FontManager * fmgr = FontManager::getInstance();
+
+	fmgr->printText(5,y[1]-y[0]-20,"Bra skit lr?",16.0, glm::vec4(1.0,0.0,0.0,1.0));
+
 }
