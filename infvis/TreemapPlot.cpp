@@ -1,6 +1,7 @@
 #include "TreemapPlot.h"
 #include <algorithm>
 #include <sstream>
+#include <iomanip>
 
 TreemapPlot::TreemapPlot() : Plot()
 {
@@ -77,7 +78,7 @@ void TreemapPlot::renderPlot()
 	// settings
 	const int * datacount = dc->getDataCount();
 	const float padding_x_left = 10.0;
-	const float padding_y_bottom = 10.0;
+	const float padding_y_bottom = 30.0;
 	const float padding_x_right = 10.0;
 	const float padding_y_top = 40.0;
 
@@ -96,12 +97,12 @@ void TreemapPlot::renderPlot()
 	root->root = true;
 
 	Node *groupNodes[groups];
+	std::ostringstream buff;
 	for (int i = 0; i < groups; ++i)
 	{
 		groupNodes[i] = new Node();
 
-		std::ostringstream buff;
-		buff<<groupScale[0]+group_diff*i;
+		buff<< std::setprecision(1) << std::fixed << groupScale[0]+group_diff*i;
 		std::string tag = "";
 		tag += buff.str();
 		buff.str("");
@@ -151,6 +152,24 @@ void TreemapPlot::renderPlot()
 
 	renderNode(root, glm::vec2(padding_x_left*scale[0], plot_width*scale[0]), glm::vec2(padding_y_bottom*scale[1], plot_height*scale[1]),colorLoc, scale);
 
+/*
+	buff.str("");
+	tag += " -> ";
+	buff<<groupScale[0]+group_diff*(i+1);
+	tag += buff.str();
+	*/
+	std::string sizeAttrib = "Size: "; 
+	sizeAttrib += dc->getAttribName(sizeIndex);
+	sizeAttrib += ", Color: ";
+	sizeAttrib += dc->getAttribName(colormap->getIndex());
+
+	fmgr->addText(	5.0f,
+					20.0f,
+					sizeAttrib.c_str(),
+					16,
+					glm::vec4(0.0,0.0,0.0,1.0)
+				);
+
 	fmgr->render();
 	fmgr->clearText();
 
@@ -188,7 +207,7 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 
 			//bottom
 			transform = glm::mat4();
-			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0],0));
+			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0]-border_width*scale[1]/2.0f,0));
 			transform = glm::scale(transform, glm::vec3(size_x[1],scale[1]*border_width, 0.0));
 			glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
@@ -197,7 +216,7 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 
 			//top
 			transform = glm::mat4();
-			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0]+size_y[1],0));
+			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0]+size_y[1]-border_width*scale[1]/2.0f,0.0));
 			transform = glm::scale(transform, glm::vec3(size_x[1],scale[1]*border_width, 0.0));
 			glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
@@ -206,8 +225,8 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 
 			//left
 			transform = glm::mat4();
-			transform = glm::translate(transform, glm::vec3(size_x[0], size_y[0],0));
-			transform = glm::scale(transform, glm::vec3(scale[0]*border_width,size_y[1], 0.0));
+			transform = glm::translate(transform, glm::vec3(size_x[0]-border_width*scale[0]/2.0f, size_y[0]-border_width*scale[1]/2.0f,0));
+			transform = glm::scale(transform, glm::vec3(scale[0]*border_width,size_y[1]+border_width*scale[1], 0.0));
 			glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
@@ -215,8 +234,8 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 
 			//right
 			transform = glm::mat4();
-			transform = glm::translate(transform, glm::vec3(size_x[0]+size_x[1], size_y[0],0));
-			transform = glm::scale(transform, glm::vec3(scale[0]*border_width,size_y[1], 0.0));
+			transform = glm::translate(transform, glm::vec3(size_x[0]+size_x[1]-border_width*scale[0]/2.0f, size_y[0]-border_width*scale[1]/2.0f,0));
+			transform = glm::scale(transform, glm::vec3(scale[0]*border_width,size_y[1]+border_width*scale[1], 0.0));
 			glUniform4fv(colorLoc, 1, glm::value_ptr(color));
 			glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
@@ -252,5 +271,6 @@ void TreemapPlot::renderNode(Node *n, glm::vec2 size_x, glm::vec2 size_y,int col
 				renderNode(n->right, size_x,size_y, colorLoc,scale);
 			}
 		}
+		
 	}
 }
