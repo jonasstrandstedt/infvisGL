@@ -80,7 +80,7 @@ void TreemapPlot::renderPlot()
 	const float padding_x_left = 10.0;
 	const float padding_y_bottom = 30.0;
 	const float padding_x_right = 10.0;
-	const float padding_y_top = 40.0;
+	const float padding_y_top = 30.0;
 
 	// start stage 2
 	const float container_width = x[1] - x[0]; 
@@ -97,11 +97,11 @@ void TreemapPlot::renderPlot()
 	root->root = true;
 
 	Node *groupNodes[groups];
-	std::ostringstream buff;
 	for (int i = 0; i < groups; ++i)
 	{
 		groupNodes[i] = new Node();
 
+		std::ostringstream buff;
 		buff<< std::setprecision(1) << std::fixed << groupScale[0]+group_diff*i;
 		std::string tag = "";
 		tag += buff.str();
@@ -152,23 +152,12 @@ void TreemapPlot::renderPlot()
 
 	renderNode(root, glm::vec2(padding_x_left*scale[0], plot_width*scale[0]), glm::vec2(padding_y_bottom*scale[1], plot_height*scale[1]),colorLoc, scale);
 
-/*
-	buff.str("");
-	tag += " -> ";
-	buff<<groupScale[0]+group_diff*(i+1);
-	tag += buff.str();
-	*/
 	std::string sizeAttrib = "Size: "; 
 	sizeAttrib += dc->getAttribName(sizeIndex);
 	sizeAttrib += ", Color: ";
 	sizeAttrib += dc->getAttribName(colormap->getIndex());
 
-	fmgr->addText(	5.0f,
-					20.0f,
-					sizeAttrib.c_str(),
-					16,
-					glm::vec4(0.0,0.0,0.0,1.0)
-				);
+	fmgr->addText(	5.0f,20.0f,sizeAttrib.c_str(),16,glm::vec4(0.0,0.0,0.0,1.0));
 
 	fmgr->render();
 	fmgr->clearText();

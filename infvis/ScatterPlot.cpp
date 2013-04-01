@@ -1,4 +1,6 @@
 #include "ScatterPlot.h"
+#include <iomanip>
+#include <sstream>
 
 ScatterPlot::ScatterPlot() : Plot()
 {
@@ -56,6 +58,8 @@ void ScatterPlot::setAxisIndex(int axis, int index)
 void ScatterPlot::renderPlot()
 {
 	std::cout << "ScatterPlot::renderPlot()" << std::endl;
+
+	FontManager * fmgr = FontManager::getInstance();
 
 	// settings
 	const int * datacount = dc->getDataCount();
@@ -137,7 +141,7 @@ void ScatterPlot::renderPlot()
 	// Draw AXIS
 
 	glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	color = glm::vec4(0.0,0.0,0.0,1.0);
 	glUniform4fv(colorLoc, 1, glm::value_ptr(color));
@@ -185,6 +189,13 @@ void ScatterPlot::renderPlot()
 		glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 		obj->render();
+
+		if (ycoord> padding_y_bottom *scale[1])
+		{
+			std::ostringstream buff;
+			buff<< std::setprecision(1) << std::fixed << rangey[0]+stepYvalue*i;
+			fmgr->addText(	padding_x_left- 30.0f,ycoord*container_height,buff.str().c_str(),14,glm::vec4(0.0,0.0,0.0,1.0));
+		}
 	}
 
 	// Y-AXIS MINORS
@@ -205,15 +216,35 @@ void ScatterPlot::renderPlot()
 		glUniformMatrix4fv(UNIFORM_LOCATION(UNIFORM_MODELTRANSFORM), 1, GL_FALSE, &transform[0][0]);
 
 		obj->render();
+		if (xcoord>= padding_x_left *scale[0])
+		{
+			std::ostringstream buff;
+			buff<< std::setprecision(1) << std::fixed << rangex[0]+stepXvalue*i;
+			fmgr->addText(	xcoord*container_width,padding_y_bottom,buff.str().c_str(),14,glm::vec4(0.0,0.0,0.0,1.0));
+		}
 	}
 
 
 	glDisable(GL_BLEND);
 
-	// TEXT
+	// color and size
+	std::string sizeAttrib = "Size: "; 
+	sizeAttrib += dc->getAttribName(sizeIndex);
+	sizeAttrib += ", Color: ";
+	sizeAttrib += dc->getAttribName(colormap->getIndex());
+	fmgr->addText(	5.0f,20.0f,sizeAttrib.c_str(),16,glm::vec4(0.0,0.0,0.0,1.0));
 
-	FontManager * fmgr = FontManager::getInstance();
+	// y
+	std::string yAttrib = ""; 
+	yAttrib += dc->getAttribName(y_index);
+	fmgr->addText(	5.0f,container_height,yAttrib.c_str(),16,glm::vec4(0.0,0.0,0.0,1.0));
 
-	fmgr->printText(5,y[1]-y[0]-20,"Bra skit lr?",16.0, glm::vec4(1.0,0.0,0.0,1.0));
-	fmgr->printText(100,100,"Bra skit lr?",16.0,glm::vec4(0.0,0.0,0.0,1.0));
+
+	// x
+	std::string xAttrib = ""; 
+	xAttrib += dc->getAttribName(x_index);
+	fmgr->addText(	container_width-60.0f,padding_y_bottom-20.0f,xAttrib.c_str(),16,glm::vec4(0.0,0.0,0.0,1.0));
+
+	fmgr->render();
+	fmgr->clearText();
 }
