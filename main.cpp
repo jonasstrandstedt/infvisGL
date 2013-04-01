@@ -176,8 +176,8 @@ void myInitFunc(void)
 	tp->setColorMap(tmcm);
 	
 	
-	sc->setTopChild(sp);
-	sc->setBottomChild(tp);
+	sc->addChild(tp);
+	sc->addChild(sp);
 }
 
 void myRenderFunc(void) 
