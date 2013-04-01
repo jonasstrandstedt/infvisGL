@@ -187,7 +187,7 @@ void myRenderFunc(void)
 	
 	FontManager * fmgr = FontManager::getInstance();
 
-	fmgr->printText(WINDOW_WIDTH / 2.0 - 30,WINDOW_HEIGHT / 2.0,dc->getTimeName(year).c_str(),20.0, glm::vec4(0.0,0.0,0.0,1.0));
+	fmgr->printText(WINDOW_WIDTH / 2.0 - 30,WINDOW_HEIGHT / 2.0+15.0f,dc->getTimeName(year).c_str(),20.0, glm::vec4(0.0,0.0,0.0,1.0));
 	
 }
 

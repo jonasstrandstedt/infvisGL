@@ -63,8 +63,8 @@ void ScatterPlot::renderPlot()
 
 	// settings
 	const int * datacount = dc->getDataCount();
-	const float padding_x_left = 70.0;
-	const float padding_y_bottom = 70.0;
+	const float padding_x_left = 60.0;
+	const float padding_y_bottom = 40.0;
 	const float padding_x_right = 10.0;
 	const float padding_y_top = 10.0;
 	const float PI = 3.14159265;
@@ -150,7 +150,7 @@ void ScatterPlot::renderPlot()
 
 	// X-AXIS MAJOR
 
-	transform = glm::translate(glm::mat4(), glm::vec3(0, padding_y_bottom*scale[1],0));
+	transform = glm::translate(glm::mat4(), glm::vec3(padding_x_left*0.9f*scale[0], padding_y_bottom*scale[1],0));
 	transform = glm::scale(transform, glm::vec3(container_width,1, 0.0));
 	transform = glm::scale(transform, glm::vec3(scale, 0.0));
 
@@ -160,7 +160,7 @@ void ScatterPlot::renderPlot()
 
 	// Y-AXIS MAJOR
 
-	transform = glm::translate(glm::mat4(), glm::vec3(padding_x_left*scale[0], 0,0));
+	transform = glm::translate(glm::mat4(), glm::vec3(padding_x_left*scale[0], padding_y_bottom*0.9f*scale[1],0));
 	transform = glm::scale(transform, glm::vec3(1,container_height, 0.0));
 	transform = glm::scale(transform, glm::vec3(scale, 0.0));
 
@@ -176,13 +176,13 @@ void ScatterPlot::renderPlot()
 	{
 		float ycoord = padding_y_bottom*scale[1] + stepXpos*i;
 
-		if(ycoord < 0.0)
+		if(ycoord < padding_y_bottom*scale[1])
 			continue;
 
 		if(ycoord > 1.0)
 			break;
 
-		transform = glm::translate(glm::mat4(), glm::vec3(0, padding_y_bottom*scale[1] + stepXpos*i,0));
+		transform = glm::translate(glm::mat4(), glm::vec3(padding_x_left*0.9f*scale[0], padding_y_bottom*scale[1] + stepXpos*i,0));
 		transform = glm::scale(transform, glm::vec3(container_width,0.2, 0.0));
 		transform = glm::scale(transform, glm::vec3(scale, 0.0));
 
@@ -203,13 +203,13 @@ void ScatterPlot::renderPlot()
 	{
 		float xcoord = padding_x_left*scale[0] + stepYpos*i;
 
-		if(xcoord < 0.0)
+		if(xcoord < padding_x_left*scale[0])
 			continue;
 
 		if(xcoord > 1.0)
 			break;
 
-		transform = glm::translate(glm::mat4(), glm::vec3(padding_x_left*scale[0] + stepYpos*i, 0,0));
+		transform = glm::translate(glm::mat4(), glm::vec3(padding_x_left*scale[0] + stepYpos*i, padding_y_bottom*0.9f*scale[1],0));
 		transform = glm::scale(transform, glm::vec3(0.2,container_height, 0.0));
 		transform = glm::scale(transform, glm::vec3(scale, 0.0));
 

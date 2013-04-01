@@ -80,7 +80,7 @@ void TreemapPlot::renderPlot()
 	const float padding_x_left = 10.0;
 	const float padding_y_bottom = 30.0;
 	const float padding_x_right = 10.0;
-	const float padding_y_top = 30.0;
+	const float padding_y_top = 20.0;
 
 	// start stage 2
 	const float container_width = x[1] - x[0]; 
