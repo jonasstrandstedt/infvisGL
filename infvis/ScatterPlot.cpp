@@ -129,8 +129,11 @@ void ScatterPlot::renderPlot()
 
 	}
 
-	int numXminor = 8;
-	int numYminor = 24;
+	float desiredXdist = 40.0;
+	float desiredYdist = 40.0;
+
+	int numXminor = int(container_height / desiredXdist);
+	int numYminor = int(container_width / desiredYdist);
 
 	float stepXpos = (container_width / (float)numXminor) / container_width;
 	float stepXvalue = (rangex[1] - rangex[0]) / (float)numXminor;
