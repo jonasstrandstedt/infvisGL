@@ -133,10 +133,10 @@ void ScatterPlot::renderPlot()
 	int numYminor = 24;
 
 	float stepXpos = (container_width / (float)numXminor) / container_width;
-	float stepXvalue = (rangex[1] - rangex[0]) / (float)numXminor;
+	float stepXvalue = (rangex[1] - rangex[0]) / (float)numYminor;
 
 	float stepYpos = (container_height / (float)numYminor) / container_height;
-	float stepYvalue = (rangey[1] - rangey[0]) / (float)numYminor;
+	float stepYvalue = (rangey[1] - rangey[0]) / (float)numXminor;
 
 	// Draw AXIS
 

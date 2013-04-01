@@ -156,6 +156,8 @@ void TreemapPlot::renderPlot()
 	sizeAttrib += dc->getAttribName(sizeIndex);
 	sizeAttrib += ", Color: ";
 	sizeAttrib += dc->getAttribName(colormap->getIndex());
+	sizeAttrib += ", Grouping: ";
+	sizeAttrib += dc->getAttribName(groupIndex);
 
 	fmgr->addText(	5.0f,20.0f,sizeAttrib.c_str(),16,glm::vec4(0.0,0.0,0.0,1.0));
 
